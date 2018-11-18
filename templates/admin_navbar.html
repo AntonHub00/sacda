@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block navbar_items %}
+<div class="collapse navbar-collapse" id="navbarId">
+  <div class="navbar-nav">
+
+    {% if active == 'home' %}
+      <a class="nav-item nav-link active text-center" href="{{ url_for('home') }}">Inicio</a>
+    {% else %}
+      <a class="nav-item nav-link text-center" href="{{ url_for('home') }}">Inicio</a>
+    {% endif %}
+
+    {% if active == 'professionals' %}
+      <a class="nav-item nav-link active text-center" href="{{ url_for('professionals') }}">Profesionistas</a>
+    {% else %}
+      <a class="nav-item nav-link text-center" href="{{ url_for('professionals') }}">Profesionistas</a>
+    {% endif %}
+
+    {% if active == 'students' %}
+    <a class="nav-item nav-link active text-center" href="{{ url_for('students') }}">Alumnos</a>
+    {% else %}
+    <a class="nav-item nav-link text-center" href="{{ url_for('students') }}">Alumnos</a>
+    {% endif %}
+
+    <!-- Begining div of the dropdown menu-->
+    {% if active == 'statistics_1' or active == 'statistics_2' %}
+    <div class="nav-item dropdown active text-center">
+    {% else %}
+    <div class="nav-item dropdown text-center">
+    {% endif %}
+
+      <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Estadísticas
+      </a>
+      <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+        <a class="dropdown-item text-center" href="{{ url_for('statistics_1') }}">Item 1</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item text-center" href="{{ url_for('statistics_2') }}">Item 2</a>
+      </div>
+    </div>
+    <!-- End div of the dropdown menu-->
+
+    <!-- Log out -->
+    <a class="nav-item nav-link text-center" href="{{ url_for('home') }}">Cerrar sesión</a>
+  </div>
+</div>
+{% endblock navbar_items %}
+
+
