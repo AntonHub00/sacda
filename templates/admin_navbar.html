@@ -1,8 +1,8 @@
-{% extends 'base.html' %}
+{% extends 'base_navbar.html' %}
 
 {% block navbar_items %}
 <div class="collapse navbar-collapse" id="navbarId">
-  <div class="navbar-nav">
+  <div class="navbar-nav mr-auto">
 
     {% if active == 'home' %}
       <a class="nav-item nav-link active text-center" href="{{ url_for('home') }}">Inicio</a>
@@ -39,9 +39,11 @@
       </div>
     </div>
     <!-- End div of the dropdown menu-->
+  </div>
 
-    <!-- Log out -->
-    <a class="nav-item nav-link text-center" href="{{ url_for('home') }}">Cerrar sesión</a>
+  <!-- Log out -->
+  <div class="navbar-nav">
+    <a class="nav-item nav-link text-center" href="#">Cerrar sesión</a>
   </div>
 </div>
 {% endblock navbar_items %}

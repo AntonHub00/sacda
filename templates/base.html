@@ -1,140 +1,35 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename = 'vendor/bootstrap/css/bootstrap.min.css') }}">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename = 'vendor/bootstrap/css/bootstrap.min.css') }}">
 
-    <!-- My metas -->
-    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename = 'img/logo.ico') }}">
+  <!-- My metas -->
+  <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename = 'img/logo.ico') }}">
 
-    <title></title>
-  </head>
-  <body>
+  <title>
+    {% block title %}
+    {% endblock title %}
+  </title>
+</head>
+<body>
 
-    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-primary" style="padding-top:0px; padding-bottom:0px">
-      <a class="navbar-brand" href="{{ url_for('home') }}">
-        <img src="{{ url_for('static', filename = 'img/logo.png') }}" width="30" height="30" class="d-inline-block align-top" alt="SACDA logo">
-        SACDA
-      </a>
+  {% block navbar %}
+  {% endblock navbar %}
 
-      <!-- Button for small devices -->
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarId" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+  <div class="container">
+    {% block content %}
+    {% endblock content %}
+  </div>
 
-      {% block navbar_items %}{% endblock navbar_items %}
-
-    </nav>
-
-    <div class="container">
-        <h1 class="text-center">Some H1  here</h1>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-        <div>
-          Dolor in aliquid minus omnis atque! Itaque totam obcaecati consequatur ea alias. Enim nemo modi consequatur modi sint? Iure dolores porro expedita possimus quasi. Minima ipsa tempore aspernatur aut aperiam?
-        </div>
-
-    </div>
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="{{ url_for('static', filename = 'vendor/jquery/jquery-3.3.1.min.js') }}"></script>
-    <script src="{{ url_for('static', filename = 'vendor/popper/popper.min.js') }}"></script>
-    <script src="{{ url_for('static', filename = 'vendor/bootstrap/js/bootstrap.min.js') }}"></script>
-  </body>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="{{ url_for('static', filename = 'vendor/jquery/jquery-3.3.1.min.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'vendor/popper/popper.min.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+</body>
 </html>
