@@ -4,46 +4,80 @@
 <div class="collapse navbar-collapse" id="navbarId">
   <div class="navbar-nav mr-auto">
 
-    {% if active == 'home' %}
-      <a class="nav-item nav-link active text-center" href="{{ url_for('home') }}">Inicio</a>
+    {% if active == 'admin_home' %}
+      <a class="nav-item nav-link active text-center" href="{{ url_for('admin_home') }}">Inicio</a>
     {% else %}
-      <a class="nav-item nav-link text-center" href="{{ url_for('home') }}">Inicio</a>
+      <a class="nav-item nav-link text-center" href="{{ url_for('admin_home') }}">Inicio</a>
     {% endif %}
 
-    {% if active == 'professionals' %}
-      <a class="nav-item nav-link active text-center" href="{{ url_for('professionals') }}">Profesionistas</a>
-    {% else %}
-      <a class="nav-item nav-link text-center" href="{{ url_for('professionals') }}">Profesionistas</a>
-    {% endif %}
-
-    {% if active == 'students' %}
-    <a class="nav-item nav-link active text-center" href="{{ url_for('students') }}">Alumnos</a>
-    {% else %}
-    <a class="nav-item nav-link text-center" href="{{ url_for('students') }}">Alumnos</a>
-    {% endif %}
-
-    <!-- Begining div of the dropdown menu-->
-    {% if active == 'statistics_1' or active == 'statistics_2' %}
+    <!-- Begining div of the professionals dropdown menu-->
+    {% if active == 'admin_professionals' %}
     <div class="nav-item dropdown active text-center">
     {% else %}
     <div class="nav-item dropdown text-center">
     {% endif %}
 
-      <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        Estadísticas
+      <a class="nav-link dropdown-toggle" href="" id="navbarDropdownProfessionals" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Profesionistas
       </a>
-      <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-        <a class="dropdown-item text-center" href="{{ url_for('statistics_1') }}">Item 1</a>
+      <div class="dropdown-menu" aria-labelledby="navbarDropdowniProfessionals">
+        <a class="dropdown-item text-center" href="{{ url_for('admin_professionals_subscribe') }}">Dar de alta</a>
         <div class="dropdown-divider"></div>
-        <a class="dropdown-item text-center" href="{{ url_for('statistics_2') }}">Item 2</a>
+        <a class="dropdown-item text-center" href="{{ url_for('admin_professionals_unsubscribe') }}">Dar de baja</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item text-center" href="{{ url_for('admin_professionals_modify') }}">Modificar</a>
       </div>
     </div>
     <!-- End div of the dropdown menu-->
+
+    <!-- Begining div of the statistics dropdown menu-->
+    {% if active == 'admin_students' %}
+    <div class="nav-item dropdown active text-center">
+    {% else %}
+    <div class="nav-item dropdown text-center">
+    {% endif %}
+
+      <a class="nav-link dropdown-toggle" href="" id="navbarDropdownStudents" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Alumnos
+      </a>
+      <div class="dropdown-menu" aria-labelledby="navbarDropdownStudents">
+        <a class="dropdown-item text-center" href="{{ url_for('admin_students_modify') }}">Modificar</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item text-center" href="{{ url_for('admin_students_unsubscribe') }}">Dar de baja</a>
+      </div>
+    </div>
+    <!-- End div of the statistics dropdown menu-->
+
+    {% if active == 'admin_schedule' %}
+    <a class="nav-item nav-link active text-center" href="{{ url_for('admin_schedule') }}">Agendas</a>
+    {% else %}
+    <a class="nav-item nav-link text-center" href="{{ url_for('admin_schedule') }}">Agendas</a>
+    {% endif %}
+
+    <!-- Begining div of the statistics dropdown menu-->
+    {% if active == 'admin_statistics' %}
+    <div class="nav-item dropdown active text-center">
+    {% else %}
+    <div class="nav-item dropdown text-center">
+    {% endif %}
+
+      <a class="nav-link dropdown-toggle" href="" id="navbarDropdownStatistics" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Estadísticas
+      </a>
+      <div class="dropdown-menu" aria-labelledby="navbarDropdownStatistics">
+        <a class="dropdown-item text-center" href="{{ url_for('admin_statistics_general') }}">Generales</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item text-center" href="{{ url_for('admin_statistics_professionals') }}">Por profesionistas</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item text-center" href="{{ url_for('admin_statistics_canalization') }}">Canalizaciones</a>
+      </div>
+    </div>
+    <!-- End div of the statistics dropdown menu-->
   </div>
 
   <!-- Log out -->
   <div class="navbar-nav">
-    <a class="nav-item nav-link text-center" href="#">Cerrar sesión</a>
+    <a class="nav-item nav-link text-center" href="{{ url_for('logout') }}">Cerrar sesión</a>
   </div>
 </div>
 {% endblock navbar_items %}

@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block navbar %}
-<nav class="navbar sticky-top navbar-expand-md navbar-dark bg-primary" style="padding-top:0px; padding-bottom:0px">
-  <a class="navbar-brand" href="{{ url_for('home') }}">
+<nav class="navbar sticky-top navbar-expand-md navbar-dark bg-primary main_navbar">
+  <a class="navbar-brand" href="{{ url_for('admin_home') }}">
     <img src="{{ url_for('static', filename = 'img/logo.png') }}" width="30" height="30" class="d-inline-block align-top" alt="SACDA logo">
     SACDA
   </a>
