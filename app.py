@@ -62,5 +62,19 @@ def admin_statistics_canalization():
 #End of statistics---------------------------------------
 # End of Admin Views ###########################################################################################
 
+# Beginning of Profesional Views ###########################################################################################
+@app.route('/professional_home')
+def professional_home():
+    return render_template('professional_home.html', active = 'professional_home')
+
+@app.route('/professional_schedule')
+def professional_schedule():
+    return render_template('professional_schedule.html', active = 'professional_schedule')
+
+@app.route('/professional_data')
+def professional_data():
+    return render_template('professional_data.html', active = 'professional_data')
+
+# End of Profesional Views ###########################################################################################
 if __name__ == '__main__':
     app.run(debug = True)

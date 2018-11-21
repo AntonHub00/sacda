@@ -1,0 +1,37 @@
+{% extends 'base_navbar.html' %}
+
+{% block home_logo %}
+{{url_for('professional_home')}}
+{% endblock home_logo %}
+
+{% block navbar_items %}
+<div class="collapse navbar-collapse" id="navbarId">
+  <div class="navbar-nav mr-auto">
+
+    {% if active == 'professional_home' %}
+      <a class="nav-item nav-link active text-center" href="{{ url_for('professional_home') }}">Inicio</a>
+    {% else %}
+      <a class="nav-item nav-link text-center" href="{{ url_for('professional_home') }}">Inicio</a>
+    {% endif %}
+
+    {% if active == 'professional_schedule' %}
+    <a class="nav-item nav-link active text-center" href="{{ url_for('professional_schedule') }}">Agenda</a>
+    {% else %}
+    <a class="nav-item nav-link text-center" href="{{ url_for('professional_schedule') }}">Agenda</a>
+    {% endif %}
+
+    {% if active == 'professional_data' %}
+    <a class="nav-item nav-link active text-center" href="{{ url_for('professional_data') }}">Mis datos</a>
+    {% else %}
+    <a class="nav-item nav-link text-center" href="{{ url_for('professional_data') }}">Mis datos</a>
+    {% endif %}
+
+  <!-- Log out -->
+  <div class="navbar-nav">
+    <a class="nav-item nav-link text-center" href="{{ url_for('logout') }}">Cerrar sesión</a>
+  </div>
+</div>
+{% endblock navbar_items %}
+
+
+

@@ -1,5 +1,9 @@
 {% extends 'base_navbar.html' %}
 
+{% block home_logo %}
+{{url_for('admin_home')}}
+{% endblock home_logo %}
+
 {% block navbar_items %}
 <div class="collapse navbar-collapse" id="navbarId">
   <div class="navbar-nav mr-auto">

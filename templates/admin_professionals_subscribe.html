@@ -3,3 +3,78 @@
 {% block title %}
 Registrar profesionistas
 {% endblock title %}
+
+
+{% block content %}
+<form>
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="nombre">Nombre</label>
+      <input type="text" class="form-control" id="nombre" placeholder="Nombre">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="apellidoMaterno">Apellido Materno</label>
+      <input type="text" class="form-control" id="apellidoMaterno" placeholder="Apellido Materno">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="apellidoPaterno">Apellido Paterno</label>
+      <input type="text" class="form-control" id="apellidoPaterno" placeholder="Apellido Paterno">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="rfc">RFC</label>
+      <input type="text" class="form-control" id="rfc" placeholder="RFC">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="correo">Correo electrónico</label>
+      <input type="email" class="form-control" id="correo" placeholder="Correo electrónico">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="telefono">Teléfono</label>
+      <input type="text" class="form-control" id="telefono" placeholder="Teléfono">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="puesto">Puesto</label>
+      <select id="puesto" class="form-control">
+        <option selected>Choose...</option>
+        <option>Puesto 1</option>
+        <option>Puesto 2</option>
+      </select>
+    </div>
+    <div class="form-group col-md-4">
+      <label for="horaEntrada">Hora de entrada</label>
+      <input type="text" class="form-control" id="horaEntrada" placeholder="Hora de entrada">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="horaSalida">Hora de salida</label>
+      <input type="text" class="form-control" id="horaSalida" placeholder="Hora de salida">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="lugar">Lugar</label>
+      <select id="lugar" class="form-control">
+        <option selected>Choose...</option>
+        <option>Lugar 1</option>
+        <option>Lugar 2</option>
+      </select>
+    </div>
+    <div class="form-group col-md-4">
+      <label for="sistema">Sistema</label>
+      <select id="sistema" class="form-control">
+        <option selected>Choose...</option>
+        <option>True</option>
+        <option>False</option>
+      </select>
+    </div>
+    <div class="form-group col-md-4">
+      <label for="contraseña">Contraseña</label>
+      <input type="text" class="form-control" id="contraseña" placeholder="Contraseña">
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary btn-block">Registrar</button>
+</form>
+{% endblock content %}
