@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session
+from flask import Flask, render_template, session, request
 from flask_mysqldb import MySQL
 import os
 
@@ -15,14 +15,7 @@ mysql = MySQL(app)
 
 @app.route('/')
 def index():
-    cur = mysql.connection.cursor()
-    cur.execute('''SELECT * FROM profesionista''')
-    #use mysql.connection.commit()
-    #if you are making an insert into the table (you need to tell mysql objecto to commit that query)
-    rv = cur.fetchall()
-    cur.close()
-    return str(rv[0][1])
-    #return render_template('index.html')
+    return render_template('index.html')
 
 @app.route('/login')
 def login():
@@ -38,9 +31,64 @@ def admin_home():
     return render_template('admin_home.html', active = 'admin_home')
 
 #Beginning of professionals---------------------------------------
-@app.route('/admin_professionals_subscribe')
+@app.route('/admin_professionals_subscribe', methods = ['GET', 'POST'])
 def admin_professionals_subscribe():
-    return render_template('admin_professionals_subscribe.html', active = 'admin_professionals')
+    if request.method == 'POST':
+        cur = mysql.connection.cursor()
+
+        nombre = request.form['nombre']
+        apellidoMaterno = request.form['apellidoMaterno']
+        apellidoPaterno = request.form['apellidoPaterno']
+        rfc = request.form['rfc']
+        correo = request.form['correo']
+        telefono = request.form['telefono']
+        puesto = request.form['puesto']
+        print(puesto)
+        cur.execute(f'''SELECT cve_puesto FROM puesto WHERE desc_puesto = '{puesto}' ''')
+        puesto = cur.fetchall()[0][0]
+        print("#############################################################")
+        print(puesto)
+        print("#############################################################")
+        horaEntrada = request.form['horaEntrada']
+        horaSalida = request.form['horaSalida']
+        lugar = request.form['lugar']
+        print(lugar)
+        cur.execute(f'''SELECT CveLugar FROM lugar WHERE DescLugar = '{lugar}' ''')
+        lugar = cur.fetchall()[0][0]
+        print("#############################################################")
+        print(lugar)
+        print("#############################################################")
+        sistema = request.form['sistema']
+        print(sistema)
+        cur.execute(f'''SELECT cve_sistema FROM sistema WHERE esta = {sistema} ''')
+        sistema =  cur.fetchall()[0][0]
+        print("#############################################################")
+        print(sistema)
+        print("#############################################################")
+        contraseña = request.form['contraseña']
+
+        cur.execute(f'''INSERT INTO profesionista VALUES('{rfc}', '{nombre}', '{apellidoMaterno}', '{apellidoPaterno}', '{correo}', '{telefono}', '{rfc}', {puesto}, '{contraseña}', '{horaEntrada}', '{horaSalida}', {lugar}, {sistema})''')
+        mysql.connection.commit()
+        cur.close()
+
+        #cur.execute('''SELECT * FROM profesionista''')
+        #result_prof = cur.fetch_all()
+        return 'Done!'
+        #return result_prof
+
+
+
+    cur = mysql.connection.cursor()
+    cur.execute('''SELECT * FROM lugar''')
+    #use mysql.connection.commit()
+    #if you are making an insert into the table (you need to tell mysql objecto to commit that query)
+    r_lugar = cur.fetchall()
+    cur.execute('''SELECT * FROM puesto''')
+    r_puesto = cur.fetchall()
+    cur.execute('''SELECT * FROM sistema''')
+    r_sistema = cur.fetchall()
+    cur.close()
+    return render_template('admin_professionals_subscribe.html', active = 'admin_professionals', r_lugar = r_lugar, r_puesto = r_puesto, r_sistema = r_sistema)
 
 @app.route('/admin_professionals_unsubscribe')
 def admin_professionals_unsubscribe():
@@ -96,3 +144,12 @@ def professional_data():
 # End of Profesional Views ###########################################################################################
 if __name__ == '__main__':
     app.run(debug = True)
+
+
+#cur = mysql.connection.cursor()
+#cur.execute('''SELECT * FROM profesionista''')
+##use mysql.connection.commit()
+##if you are making an insert into the table (you need to tell mysql objecto to commit that query)
+#rv = cur.fetchall()
+#cur.close()
+#return str(rv[0][1])

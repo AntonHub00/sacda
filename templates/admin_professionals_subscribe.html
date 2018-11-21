@@ -6,73 +6,76 @@ Registrar profesionistas
 
 
 {% block content %}
-<form action="#">
+<form method="POST" action="{{ url_for('admin_professionals_subscribe') }}">
   <div class="form-row">
     <div class="form-group col-md-4">
       <label for="nombre">Nombre</label>
-      <input type="text" class="form-control" id="nombre" placeholder="Nombre">
+      <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre">
     </div>
     <div class="form-group col-md-4">
       <label for="apellidoMaterno">Apellido Materno</label>
-      <input type="text" class="form-control" id="apellidoMaterno" placeholder="Apellido Materno">
+      <input type="text" class="form-control" id="apellidoMaterno" name="apellidoMaterno" placeholder="Apellido Materno">
     </div>
     <div class="form-group col-md-4">
       <label for="apellidoPaterno">Apellido Paterno</label>
-      <input type="text" class="form-control" id="apellidoPaterno" placeholder="Apellido Paterno">
+      <input type="text" class="form-control" id="apellidoPaterno" name="apellidoPaterno" placeholder="Apellido Paterno">
     </div>
   </div>
   <div class="form-row">
     <div class="form-group col-md-4">
       <label for="rfc">RFC</label>
-      <input type="text" class="form-control" id="rfc" placeholder="RFC">
+      <input type="text" class="form-control" id="rfc" name="rfc" placeholder="RFC">
     </div>
     <div class="form-group col-md-4">
       <label for="correo">Correo electrónico</label>
-      <input type="email" class="form-control" id="correo" placeholder="Correo electrónico">
+      <input type="email" class="form-control" id="correo" name="correo" placeholder="Correo electrónico">
     </div>
     <div class="form-group col-md-4">
       <label for="telefono">Teléfono</label>
-      <input type="text" class="form-control" id="telefono" placeholder="Teléfono">
+      <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Teléfono">
     </div>
   </div>
   <div class="form-row">
     <div class="form-group col-md-4">
       <label for="puesto">Puesto</label>
-      <select id="puesto" class="form-control">
+      <select id="puesto" name="puesto" class="form-control">
         <option selected>Choose...</option>
-        <option>Puesto 1</option>
-        <option>Puesto 2</option>
+        {% for puesto in r_puesto %}
+        <option>{{ puesto[1] }}</option>
+        {% endfor %}
       </select>
     </div>
     <div class="form-group col-md-4">
       <label for="horaEntrada">Hora de entrada</label>
-      <input type="text" class="form-control" id="horaEntrada" placeholder="Hora de entrada">
+      <input type="text" class="form-control" id="horaEntrada" name="horaEntrada" placeholder="Hora de entrada">
     </div>
     <div class="form-group col-md-4">
       <label for="horaSalida">Hora de salida</label>
-      <input type="text" class="form-control" id="horaSalida" placeholder="Hora de salida">
+      <input type="text" class="form-control" id="horaSalida" name="horaSalida" placeholder="Hora de salida">
     </div>
   </div>
   <div class="form-row">
     <div class="form-group col-md-4">
       <label for="lugar">Lugar</label>
-      <select id="lugar" class="form-control">
-        <option selected>Choose...</option>
-        <option>Lugar 1</option>
-        <option>Lugar 2</option>
+      <select id="lugar" name="lugar" class="form-control">
+        <option selected>Elegir...</option>
+        {% for lugar in r_lugar %}
+        <option>{{ lugar[1] }}</option>
+        {% endfor %}
       </select>
     </div>
     <div class="form-group col-md-4">
       <label for="sistema">Sistema</label>
-      <select id="sistema" class="form-control">
+      <select id="sistema" name="sistema" class="form-control">
         <option selected>Choose...</option>
-        <option>True</option>
-        <option>False</option>
+        {% for sistema in r_sistema %}
+        <option>{{ sistema[1] }}</option>
+        {% endfor %}
       </select>
     </div>
     <div class="form-group col-md-4">
       <label for="contraseña">Contraseña</label>
-      <input type="text" class="form-control" id="contraseña" placeholder="Contraseña">
+      <input type="text" class="form-control" id="contraseña" name="contraseña" placeholder="Contraseña">
     </div>
   </div>
   <button type="submit" class="btn btn-primary btn-block">Registrar</button>
