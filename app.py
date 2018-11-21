@@ -1,10 +1,28 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, session
+from flask_mysqldb import MySQL
+import os
 
 app = Flask(__name__)
+#app.secret_key = os.urandom(24)
+
+#This data shouldn't be filled here (could use a yaml config file)
+#app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_HOST'] = '127.0.0.1'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'fis_practice'
+mysql = MySQL(app)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    cur = mysql.connection.cursor()
+    cur.execute('''SELECT * FROM profesionista''')
+    #use mysql.connection.commit()
+    #if you are making an insert into the table (you need to tell mysql objecto to commit that query)
+    rv = cur.fetchall()
+    cur.close()
+    return str(rv[0][1])
+    #return render_template('index.html')
 
 @app.route('/login')
 def login():
