@@ -2,6 +2,7 @@
 
 {% macro spit_professionals() %}
 {% for professional in r_professionals %}
+{% if professional[12] == 1%}
 <tr>
   <th scope="row">{{professional[0]}}</th>
   <td>{{professional[1]}}</td>
@@ -13,13 +14,13 @@
   <td>{{professional[9]}}</td>
   <td>{{professional[10]}}</td>
   <td>{{professional[11]}}</td>
-  <td>{{professional[12]}}</td>
   <td>
     <form action="{{ url_for('admin_professionals_unsubscribe') }}" method="POST">
       <button type="submit" class="btn btn-danger" name="enviar" value="{{professional[0]}}"/>Eliminar</button>
     </form>
   </td>
 </tr>
+{% endif %}
 {% endfor %}
 {% endmacro %}
 
@@ -42,7 +43,6 @@ Dar de baja profesionistas
         <th scope="col">Horario de entrada</th>
         <th scope="col">Horario de salida</th>
         <th scope="col">Lugar asignado</th>
-        <th scope="col">Estado</th>
         <th scope="col">Eliminar</th>
       </tr>
     </thead>
