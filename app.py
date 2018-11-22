@@ -1,9 +1,13 @@
-from flask import Flask, render_template, session, request
+from flask import Flask, render_template, session, request, redirect, url_for
 from flask_mysqldb import MySQL
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
-#app.secret_key = os.urandom(24)
+#secret_key function is needed for session handling
+app.secret_key = os.urandom(24)
+
+#check_password_hash(returned_data[0][2], password)
 
 #This data shouldn't be filled here (could use a yaml config file)
 #app.config['MYSQL_HOST'] = 'localhost'
@@ -17,13 +21,30 @@ mysql = MySQL(app)
 def index():
     return render_template('index.html')
 
-@app.route('/login')
+@app.route('/login', methods = ['GET', 'POST'])
 def login():
+    if request.method == 'POST':
+        cur = mysql.connection.cursor()
+        user = request.form['usuario']
+        password = request.form['contraseña']
+        cur.execute(f'''SELECT  ContraProf FROM profesionista WHERE RFC_Profesor = '{user}' ''')
+        r_password = cur.fetchall()[0][0]
+        cur.close()
+
+        if check_password_hash(r_password, password):
+            session['user'] = user
+            return redirect(url_for('professional_home'))
+
+    if 'user' in session:
+        return redirect(url_for('professional_home'))
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
-    return render_template('logout.html')
+    if 'user' in session:
+        session.pop('user', None)
+
+    return redirect(url_for('login'))
 
 # Beginning of Admin Views ###########################################################################################
 @app.route('/admin_home')
@@ -43,31 +64,16 @@ def admin_professionals_subscribe():
         correo = request.form['correo']
         telefono = request.form['telefono']
         puesto = request.form['puesto']
-        print(puesto)
         cur.execute(f'''SELECT cve_puesto FROM puesto WHERE desc_puesto = '{puesto}' ''')
         puesto = cur.fetchall()[0][0]
-        print("#############################################################")
-        print(puesto)
-        print("#############################################################")
         horaEntrada = request.form['horaEntrada']
         horaSalida = request.form['horaSalida']
         lugar = request.form['lugar']
-        print(lugar)
         cur.execute(f'''SELECT CveLugar FROM lugar WHERE DescLugar = '{lugar}' ''')
         lugar = cur.fetchall()[0][0]
-        print("#############################################################")
-        print(lugar)
-        print("#############################################################")
-        sistema = request.form['sistema']
-        print(sistema)
-        cur.execute(f'''SELECT cve_sistema FROM sistema WHERE esta = {sistema} ''')
-        sistema =  cur.fetchall()[0][0]
-        print("#############################################################")
-        print(sistema)
-        print("#############################################################")
-        contraseña = request.form['contraseña']
+        contraseña = generate_password_hash(request.form['contraseña'], method = 'sha256')
 
-        cur.execute(f'''INSERT INTO profesionista VALUES('{rfc}', '{nombre}', '{apellidoMaterno}', '{apellidoPaterno}', '{correo}', '{telefono}', '{rfc}', {puesto}, '{contraseña}', '{horaEntrada}', '{horaSalida}', {lugar}, {sistema})''')
+        cur.execute(f'''INSERT INTO profesionista VALUES('{rfc}', '{nombre}', '{apellidoMaterno}', '{apellidoPaterno}', '{correo}', '{telefono}', '{rfc}', {puesto}, '{contraseña}', '{horaEntrada}', '{horaSalida}', {lugar}, 1)''')
         mysql.connection.commit()
         cur.close()
 
@@ -76,23 +82,37 @@ def admin_professionals_subscribe():
         return 'Done!'
         #return result_prof
 
-
-
     cur = mysql.connection.cursor()
     cur.execute('''SELECT * FROM lugar''')
-    #use mysql.connection.commit()
-    #if you are making an insert into the table (you need to tell mysql objecto to commit that query)
     r_lugar = cur.fetchall()
     cur.execute('''SELECT * FROM puesto''')
     r_puesto = cur.fetchall()
-    cur.execute('''SELECT * FROM sistema''')
-    r_sistema = cur.fetchall()
     cur.close()
-    return render_template('admin_professionals_subscribe.html', active = 'admin_professionals', r_lugar = r_lugar, r_puesto = r_puesto, r_sistema = r_sistema)
+    return render_template('admin_professionals_subscribe.html', active = 'admin_professionals', r_lugar = r_lugar, r_puesto = r_puesto)
 
-@app.route('/admin_professionals_unsubscribe')
+@app.route('/admin_professionals_unsubscribe', methods = ['GET', 'POST'])
 def admin_professionals_unsubscribe():
-    return render_template('admin_professionals_unsubscribe.html', active = 'admin_professionals')
+    if request.method == 'POST':
+        key = request.form['enviar']
+        cur = mysql.connection.cursor()
+        cur.execute(f''' SELECT sistema FROM profesionista WHERE RFC_Profesor = '{key}' ''')
+        value = cur.fetchall()[0][0]
+        print(type(value))
+        cur.close()
+        if value == 1:
+            cur = mysql.connection.cursor()
+            cur.execute(f''' UPDATE profesionista SET sistema = 0 WHERE RFC_Profesor = '{key}' ''')
+            mysql.connection.commit()
+            cur.close()
+
+        return redirect(url_for('admin_professionals_unsubscribe'))
+
+    cur = mysql.connection.cursor()
+    cur.execute('''SELECT * FROM profesionista''')
+    r_professionals = cur.fetchall()
+    cur.close()
+
+    return render_template('admin_professionals_unsubscribe.html', active = 'admin_professionals', r_professionals = r_professionals)
 
 @app.route('/admin_professionals_modify')
 def admin_professionals_modify():
@@ -131,15 +151,24 @@ def admin_statistics_canalization():
 # Beginning of Profesional Views ###########################################################################################
 @app.route('/professional_home')
 def professional_home():
-    return render_template('professional_home.html', active = 'professional_home')
+    if 'user' in session:
+        return render_template('professional_home.html', active = 'professional_home')
+
+    return 'Necesitas iniciar sesión primero'
 
 @app.route('/professional_schedule')
 def professional_schedule():
-    return render_template('professional_schedule.html', active = 'professional_schedule')
+    if 'user' in session:
+        return render_template('professional_schedule.html', active = 'professional_schedule')
+
+    return 'Necesitas iniciar sesión primero'
 
 @app.route('/professional_data')
 def professional_data():
-    return render_template('professional_data.html', active = 'professional_data')
+    if 'user' in session:
+        return render_template('professional_data.html', active = 'professional_data')
+
+    return 'Necesitas iniciar sesión primero'
 
 # End of Profesional Views ###########################################################################################
 if __name__ == '__main__':

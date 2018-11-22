@@ -1,5 +1,54 @@
 {% extends 'admin_navbar.html' %}
 
+{% macro spit_professionals() %}
+{% for professional in r_professionals %}
+<tr>
+  <th scope="row">{{professional[0]}}</th>
+  <td>{{professional[1]}}</td>
+  <td>{{professional[2]}}</td>
+  <td>{{professional[3]}}</td>
+  <td>{{professional[4]}}</td>
+  <td>{{professional[6]}}</td>
+  <td>{{professional[7]}}</td>
+  <td>{{professional[9]}}</td>
+  <td>{{professional[10]}}</td>
+  <td>{{professional[11]}}</td>
+  <td>{{professional[12]}}</td>
+  <td>
+    <form action="{{ url_for('admin_professionals_unsubscribe') }}" method="POST">
+      <button type="submit" class="btn btn-danger" name="enviar" value="{{professional[0]}}"/>Eliminar</button>
+    </form>
+  </td>
+</tr>
+{% endfor %}
+{% endmacro %}
+
 {% block title %}
 Dar de baja profesionistas
 {% endblock title %}
+
+{% block other_content  %}
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">RFC</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">Apellido Paterno</th>
+        <th scope="col">Apellido Materno</th>
+        <th scope="col">Correo</th>
+        <th scope="col">Teléfono</th>
+        <th scope="col">Puesto</th>
+        <th scope="col">Horario de entrada</th>
+        <th scope="col">Horario de salida</th>
+        <th scope="col">Lugar asignado</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Eliminar</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{ spit_professionals() }}
+    </tbody>
+  </table>
+</div>
+{% endblock other_content %}

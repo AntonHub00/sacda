@@ -1,5 +1,11 @@
 {% extends 'admin_navbar.html' %}
 
+{% macro render_hours() %}
+{% for hour in range(24) %}
+<option>{{ '{:02d}:00'.format(hour) }}</option>
+{% endfor %}
+{% endmacro %}
+
 {% block title %}
 Registrar profesionistas
 {% endblock title %}
@@ -13,12 +19,12 @@ Registrar profesionistas
       <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre">
     </div>
     <div class="form-group col-md-4">
-      <label for="apellidoMaterno">Apellido Materno</label>
-      <input type="text" class="form-control" id="apellidoMaterno" name="apellidoMaterno" placeholder="Apellido Materno">
-    </div>
-    <div class="form-group col-md-4">
       <label for="apellidoPaterno">Apellido Paterno</label>
       <input type="text" class="form-control" id="apellidoPaterno" name="apellidoPaterno" placeholder="Apellido Paterno">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="apellidoMaterno">Apellido Materno</label>
+      <input type="text" class="form-control" id="apellidoMaterno" name="apellidoMaterno" placeholder="Apellido Materno">
     </div>
   </div>
   <div class="form-row">
@@ -39,7 +45,7 @@ Registrar profesionistas
     <div class="form-group col-md-4">
       <label for="puesto">Puesto</label>
       <select id="puesto" name="puesto" class="form-control">
-        <option selected>Choose...</option>
+        <option selected>Elegir...</option>
         {% for puesto in r_puesto %}
         <option>{{ puesto[1] }}</option>
         {% endfor %}
@@ -47,15 +53,21 @@ Registrar profesionistas
     </div>
     <div class="form-group col-md-4">
       <label for="horaEntrada">Hora de entrada</label>
-      <input type="text" class="form-control" id="horaEntrada" name="horaEntrada" placeholder="Hora de entrada">
+      <select id="horaEntrada" name="horaEntrada" class="form-control">
+        <option selected>Elegir...</option>
+        {{ render_hours() }}
+      </select>
     </div>
     <div class="form-group col-md-4">
-      <label for="horaSalida">Hora de salida</label>
-      <input type="text" class="form-control" id="horaSalida" name="horaSalida" placeholder="Hora de salida">
+      <label for="horaSalida">Hora de entrada</label>
+      <select id="horaSalida" name="horaSalida" class="form-control">
+        <option selected>Elegir...</option>
+        {{ render_hours() }}
+      </select>
     </div>
   </div>
   <div class="form-row">
-    <div class="form-group col-md-4">
+    <div class="form-group col-md-6">
       <label for="lugar">Lugar</label>
       <select id="lugar" name="lugar" class="form-control">
         <option selected>Elegir...</option>
@@ -64,16 +76,7 @@ Registrar profesionistas
         {% endfor %}
       </select>
     </div>
-    <div class="form-group col-md-4">
-      <label for="sistema">Sistema</label>
-      <select id="sistema" name="sistema" class="form-control">
-        <option selected>Choose...</option>
-        {% for sistema in r_sistema %}
-        <option>{{ sistema[1] }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="form-group col-md-4">
+    <div class="form-group col-md-6">
       <label for="contraseña">Contraseña</label>
       <input type="text" class="form-control" id="contraseña" name="contraseña" placeholder="Contraseña">
     </div>

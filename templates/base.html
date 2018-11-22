@@ -30,6 +30,12 @@
     {% endblock content %}
   </div>
 
+  <div class="container-fluid">
+    {% block other_content %}
+    {% endblock other_content %}
+  </div>
+
+
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
   <script src="{{ url_for('static', filename = 'vendor/jquery/jquery-3.3.1.min.js') }}"></script>
