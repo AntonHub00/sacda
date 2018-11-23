@@ -1,8 +1,8 @@
 {% extends 'admin_navbar.html' %}
 
 {% macro render_hours() %}
-{% for hour in range(24) %}
-<option>{{ '{:02d}:00'.format(hour) }}</option>
+{% for hour in range(7, 22) %}
+<option selected>{{ '{:02d}:00'.format(hour) }}</option>
 {% endfor %}
 {% endmacro %}
 
@@ -45,23 +45,21 @@ Registrar profesionistas
     <div class="form-group col-md-4">
       <label for="puesto">Puesto</label>
       <select id="puesto" name="puesto" class="form-control">
-        <option selected>Elegir...</option>
         {% for puesto in r_puesto %}
-        <option>{{ puesto[1] }}</option>
+        <option selected>{{ puesto[1] }}</option>
+        <!-- <option>{{ puesto[1] }}</option> -->
         {% endfor %}
       </select>
     </div>
     <div class="form-group col-md-4">
       <label for="horaEntrada">Hora de entrada</label>
       <select id="horaEntrada" name="horaEntrada" class="form-control">
-        <option selected>Elegir...</option>
         {{ render_hours() }}
       </select>
     </div>
     <div class="form-group col-md-4">
       <label for="horaSalida">Hora de entrada</label>
       <select id="horaSalida" name="horaSalida" class="form-control">
-        <option selected>Elegir...</option>
         {{ render_hours() }}
       </select>
     </div>
@@ -70,9 +68,8 @@ Registrar profesionistas
     <div class="form-group col-md-6">
       <label for="lugar">Lugar</label>
       <select id="lugar" name="lugar" class="form-control">
-        <option selected>Elegir...</option>
         {% for lugar in r_lugar %}
-        <option>{{ lugar[1] }}</option>
+        <option selected>{{ lugar[1] }}</option>
         {% endfor %}
       </select>
     </div>

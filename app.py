@@ -27,13 +27,12 @@ def login():
         cur = mysql.connection.cursor()
         user = request.form['usuario']
         password = request.form['contraseña']
-        cur.execute(f'''SELECT  ContraProf FROM profesionista WHERE RFC_Profesor = '{user}' ''')
+        cur.execute(f''' SELECT  ContraProf FROM profesionista WHERE RFC_Profesor = '{user}' ''')
         r_password = cur.fetchall()[0][0]
         cur.close()
 
         if check_password_hash(r_password, password):
             session['user'] = user
-            return redirect(url_for('professional_home'))
 
     if 'user' in session:
         return redirect(url_for('professional_home'))
@@ -64,12 +63,12 @@ def admin_professionals_subscribe():
         correo = request.form['correo']
         telefono = request.form['telefono']
         puesto = request.form['puesto']
-        cur.execute(f'''SELECT cve_puesto FROM puesto WHERE desc_puesto = '{puesto}' ''')
+        cur.execute(f''' SELECT cve_puesto FROM puesto WHERE desc_puesto = '{puesto}' ''')
         puesto = cur.fetchall()[0][0]
         horaEntrada = request.form['horaEntrada']
         horaSalida = request.form['horaSalida']
         lugar = request.form['lugar']
-        cur.execute(f'''SELECT CveLugar FROM lugar WHERE DescLugar = '{lugar}' ''')
+        cur.execute(f''' SELECT CveLugar FROM lugar WHERE DescLugar = '{lugar}' ''')
         lugar = cur.fetchall()[0][0]
         contraseña = generate_password_hash(request.form['contraseña'], method = 'sha256')
 
@@ -77,15 +76,15 @@ def admin_professionals_subscribe():
         mysql.connection.commit()
         cur.close()
 
-        #cur.execute('''SELECT * FROM profesionista''')
+        #cur.execute(''' SELECT * FROM profesionista''')
         #result_prof = cur.fetch_all()
         return 'Done!'
         #return result_prof
 
     cur = mysql.connection.cursor()
-    cur.execute('''SELECT * FROM lugar''')
+    cur.execute(''' SELECT * FROM lugar''')
     r_lugar = cur.fetchall()
-    cur.execute('''SELECT * FROM puesto''')
+    cur.execute(''' SELECT * FROM puesto''')
     r_puesto = cur.fetchall()
     cur.close()
     return render_template('admin_professionals_subscribe.html', active = 'admin_professionals', r_lugar = r_lugar, r_puesto = r_puesto)
@@ -108,7 +107,7 @@ def admin_professionals_unsubscribe():
         return redirect(url_for('admin_professionals_unsubscribe'))
 
     cur = mysql.connection.cursor()
-    cur.execute('''SELECT * FROM profesionista''')
+    cur.execute(''' SELECT * FROM profesionista''')
     r_professionals = cur.fetchall()
     cur.close()
 
@@ -152,7 +151,11 @@ def admin_statistics_canalization():
 @app.route('/professional_home')
 def professional_home():
     if 'user' in session:
-        return render_template('professional_home.html', active = 'professional_home')
+        cur = mysql.connection.cursor()
+        cur.execute(f'''SELECT NombreProf FROM profesionista WHERE RFC_Profesor = '{session['user']}' ''')
+        professional_name = cur.fetchall()[0][0]
+        cur.close()
+        return render_template('professional_home.html', active = 'professional_home', professional_name = professional_name)
 
     return 'Necesitas iniciar sesión primero'
 
@@ -176,7 +179,7 @@ if __name__ == '__main__':
 
 
 #cur = mysql.connection.cursor()
-#cur.execute('''SELECT * FROM profesionista''')
+#cur.execute(''' SELECT * FROM profesionista''')
 ##use mysql.connection.commit()
 ##if you are making an insert into the table (you need to tell mysql objecto to commit that query)
 #rv = cur.fetchall()
