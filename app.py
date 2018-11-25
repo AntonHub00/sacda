@@ -21,6 +21,8 @@ mysql = MySQL(app)
 def index():
     return render_template('index.html')
 
+#JSON web tokens
+
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -29,9 +31,11 @@ def login():
         password = request.form['contraseña']
         cur.execute(f''' SELECT  ContraProf FROM profesionista WHERE RFC_Profesor = '{user}' ''')
         r_password = cur.fetchall()[0][0]
+        cur.execute(f''' SELECT  sistema FROM profesionista WHERE RFC_Profesor = '{user}' ''')
+        system_flag = cur.fetchall()[0][0]
         cur.close()
 
-        if check_password_hash(r_password, password):
+        if check_password_hash(r_password, password) and system_flag == 1:
             session['user'] = user
 
     if 'user' in session:
@@ -72,7 +76,7 @@ def admin_professionals_subscribe():
         lugar = cur.fetchall()[0][0]
         contraseña = generate_password_hash(request.form['contraseña'], method = 'sha256')
 
-        cur.execute(f'''INSERT INTO profesionista VALUES('{rfc}', '{nombre}', '{apellidoMaterno}', '{apellidoPaterno}', '{correo}', '{telefono}', '{rfc}', {puesto}, '{contraseña}', '{horaEntrada}', '{horaSalida}', {lugar}, 1)''')
+        cur.execute(f'''INSERT INTO profesionista VALUES('{rfc}', '{nombre}', '{apellidoPaterno}', '{apellidoMaterno}', '{correo}', '{telefono}', '{rfc}', {puesto}, '{contraseña}', '{horaEntrada}', '{horaSalida}', {lugar}, 1)''')
         mysql.connection.commit()
         cur.close()
 
@@ -107,7 +111,7 @@ def admin_professionals_unsubscribe():
         return redirect(url_for('admin_professionals_unsubscribe'))
 
     cur = mysql.connection.cursor()
-    cur.execute(''' SELECT * FROM profesionista''')
+    cur.execute(''' SELECT RFC_Profesor, NombreProf, Primer_ApellidoP, Segundo_ApellidoP, puesto.desc_puesto, lugar.DescLugar, HorarioEntrada, HorarioSalida, CorreoP, TelProf, sistema FROM profesionista INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar INNER JOIN puesto ON profesionista.PuestoProf = puesto.cve_puesto''')
     r_professionals = cur.fetchall()
     cur.close()
 
