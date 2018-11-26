@@ -1,6 +1,6 @@
 {% extends 'admin_navbar.html' %}
 
-{% macro spit_professionals() %}
+{% macro render_professionals() %}
 {% for professional in r_professionals %}
   {% if professional[10] == 1%}
   <tr>
@@ -16,7 +16,7 @@
     <td>{{professional[9]}}</td>
     <td>
       <form action="{{ url_for('admin_professionals_unsubscribe') }}" method="POST">
-        <button type="submit" class="btn btn-danger" name="enviar" value="{{professional[0]}}"/>Eliminar</button>
+        <button type="submit" class="btn btn-danger" name="to_delete" value="{{professional[0]}}"/>Eliminar</button>
       </form>
     </td>
   </tr>
@@ -47,7 +47,7 @@ Dar de baja profesionistas
       </tr>
     </thead>
     <tbody class="text-center">
-      {{ spit_professionals() }}
+      {{ render_professionals() }}
     </tbody>
   </table>
 </div>

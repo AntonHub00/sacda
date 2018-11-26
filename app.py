@@ -4,18 +4,20 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
+
 #secret_key function is needed for session handling
 app.secret_key = os.urandom(24)
 
-#check_password_hash(returned_data[0][2], password)
+#check_password_hash(stored_password, password_given_in_form)
 
 #This data shouldn't be filled here (could use a yaml config file)
-#app.config['MYSQL_HOST'] = 'localhost'
+#'localhost' doesn't work, just with '127.0.0.1' ('localhost' = '127.0.0.1')
 app.config['MYSQL_HOST'] = '127.0.0.1'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'fis_practice'
 mysql = MySQL(app)
+#use "mysql.connection.commit()" if you are making an insert into a table (you need to tell mysql object to commit that query)
 
 @app.route('/')
 def index():
@@ -27,12 +29,16 @@ def index():
 def login():
     if request.method == 'POST':
         cur = mysql.connection.cursor()
-        user = request.form['usuario']
-        password = request.form['contraseña']
-        cur.execute(f''' SELECT  ContraProf FROM profesionista WHERE RFC_Profesor = '{user}' ''')
-        r_password = cur.fetchall()[0][0]
-        cur.execute(f''' SELECT  sistema FROM profesionista WHERE RFC_Profesor = '{user}' ''')
-        system_flag = cur.fetchall()[0][0]
+
+        user = request.form['user']
+        password = request.form['password']
+
+        cur.execute(f''' SELECT ContraProf, sistema FROM profesionista WHERE RFC_Profesor = '{user}' ''')
+        query_result = cur.fetchall()
+        #TODO: Validate user exists (could verify if rows (registers) > 0; it means user exists)
+        r_password = query_result[0][0]
+        system_flag = query_result[0][1]
+
         cur.close()
 
         if check_password_hash(r_password, password) and system_flag == 1:
@@ -60,23 +66,23 @@ def admin_professionals_subscribe():
     if request.method == 'POST':
         cur = mysql.connection.cursor()
 
-        nombre = request.form['nombre']
-        apellidoMaterno = request.form['apellidoMaterno']
-        apellidoPaterno = request.form['apellidoPaterno']
+        name = request.form['name']
+        first_last_name = request.form['first_last_name']
+        second_last_name = request.form['second_last_name']
         rfc = request.form['rfc']
-        correo = request.form['correo']
-        telefono = request.form['telefono']
-        puesto = request.form['puesto']
-        cur.execute(f''' SELECT cve_puesto FROM puesto WHERE desc_puesto = '{puesto}' ''')
-        puesto = cur.fetchall()[0][0]
-        horaEntrada = request.form['horaEntrada']
-        horaSalida = request.form['horaSalida']
-        lugar = request.form['lugar']
-        cur.execute(f''' SELECT CveLugar FROM lugar WHERE DescLugar = '{lugar}' ''')
-        lugar = cur.fetchall()[0][0]
-        contraseña = generate_password_hash(request.form['contraseña'], method = 'sha256')
+        email = request.form['email']
+        phone = request.form['phone']
+        job = request.form['job']
+        cur.execute(f''' SELECT cve_puesto FROM puesto WHERE desc_puesto = '{job}' ''')
+        job = cur.fetchall()[0][0]
+        entry_time = request.form['entry_time']
+        exit_time = request.form['exit_time']
+        place = request.form['place']
+        cur.execute(f''' SELECT CveLugar FROM lugar WHERE DescLugar = '{place}' ''')
+        place = cur.fetchall()[0][0]
+        password = generate_password_hash(request.form['password'], method = 'sha256')
 
-        cur.execute(f'''INSERT INTO profesionista VALUES('{rfc}', '{nombre}', '{apellidoPaterno}', '{apellidoMaterno}', '{correo}', '{telefono}', '{rfc}', {puesto}, '{contraseña}', '{horaEntrada}', '{horaSalida}', {lugar}, 1)''')
+        cur.execute(f'''INSERT INTO profesionista VALUES('{rfc}', '{name}', '{first_last_name}', '{second_last_name}', '{email}', '{phone}', '{rfc}', {job}, '{password}', '{entry_time}', '{exit_time}', {place}, 1)''')
         mysql.connection.commit()
         cur.close()
 
@@ -87,24 +93,23 @@ def admin_professionals_subscribe():
 
     cur = mysql.connection.cursor()
     cur.execute(''' SELECT * FROM lugar''')
-    r_lugar = cur.fetchall()
+    r_place = cur.fetchall()
     cur.execute(''' SELECT * FROM puesto''')
-    r_puesto = cur.fetchall()
+    r_job = cur.fetchall()
     cur.close()
-    return render_template('admin_professionals_subscribe.html', active = 'admin_professionals', r_lugar = r_lugar, r_puesto = r_puesto)
+    return render_template('admin_professionals_subscribe.html', active = 'admin_professionals', r_place = r_place, r_job = r_job)
 
 @app.route('/admin_professionals_unsubscribe', methods = ['GET', 'POST'])
 def admin_professionals_unsubscribe():
     if request.method == 'POST':
-        key = request.form['enviar']
+        professional_key = request.form['to_delete']
         cur = mysql.connection.cursor()
-        cur.execute(f''' SELECT sistema FROM profesionista WHERE RFC_Profesor = '{key}' ''')
-        value = cur.fetchall()[0][0]
-        print(type(value))
+        cur.execute(f''' SELECT sistema FROM profesionista WHERE RFC_Profesor = '{professional_key}' ''')
+        in_system = cur.fetchall()[0][0]
         cur.close()
-        if value == 1:
+        if in_system == 1:
             cur = mysql.connection.cursor()
-            cur.execute(f''' UPDATE profesionista SET sistema = 0 WHERE RFC_Profesor = '{key}' ''')
+            cur.execute(f''' UPDATE profesionista SET sistema = 0 WHERE RFC_Profesor = '{professional_key}' ''')
             mysql.connection.commit()
             cur.close()
 
@@ -180,12 +185,3 @@ def professional_data():
 # End of Profesional Views ###########################################################################################
 if __name__ == '__main__':
     app.run(debug = True)
-
-
-#cur = mysql.connection.cursor()
-#cur.execute(''' SELECT * FROM profesionista''')
-##use mysql.connection.commit()
-##if you are making an insert into the table (you need to tell mysql objecto to commit that query)
-#rv = cur.fetchall()
-#cur.close()
-#return str(rv[0][1])
