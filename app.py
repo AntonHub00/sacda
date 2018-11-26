@@ -56,10 +56,16 @@ def logout():
     return redirect(url_for('login'))
 
 # Beginning of Admin Views ###########################################################################################
-@app.route('/administrador')
-@app.route('/administrador/')
-@app.route('/administrador/inicio')
+@app.route('/administrador', methods = ['GET', 'POST'])
+@app.route('/administrador/', methods = ['GET', 'POST'])
+@app.route('/administrador/inicio', methods = ['GET', 'POST'])
 def admin_home():
+    #if request.method == 'POST':
+    #    result = request.form['delete']
+    #    print(result)
+    #    if result == 'yes':
+    #        return 'The element has been deleted'
+    #    return 'The element has no changes'
     return render_template('admin/home.html', active = 'admin_home')
 
 #Beginning of professionals---------------------------------------
