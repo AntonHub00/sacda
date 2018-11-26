@@ -164,21 +164,21 @@ def professional_home():
         cur.execute(f'''SELECT NombreProf FROM profesionista WHERE RFC_Profesor = '{session['user']}' ''')
         professional_name = cur.fetchall()[0][0]
         cur.close()
-        return render_template('professionals/professional_home.html', active = 'professional_home', professional_name = professional_name)
+        return render_template('professional/professional_home.html', active = 'professional_home', professional_name = professional_name)
 
     return 'Necesitas iniciar sesión primero'
 
 @app.route('/professional_schedule')
 def professional_schedule():
     if 'user' in session:
-        return render_template('professionals/professional_schedule.html', active = 'professional_schedule')
+        return render_template('professional/professional_schedule.html', active = 'professional_schedule')
 
     return 'Necesitas iniciar sesión primero'
 
 @app.route('/professional_data')
 def professional_data():
     if 'user' in session:
-        return render_template('professionals/professional_data.html', active = 'professional_data')
+        return render_template('professional/professional_data.html', active = 'professional_data')
 
     return 'Necesitas iniciar sesión primero'
 
