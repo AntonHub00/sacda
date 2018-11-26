@@ -58,7 +58,7 @@ def logout():
 # Beginning of Admin Views ###########################################################################################
 @app.route('/admin_home')
 def admin_home():
-    return render_template('admin/admin_home.html', active = 'admin_home')
+    return render_template('admin/home.html', active = 'admin_home')
 
 #Beginning of professionals---------------------------------------
 @app.route('/admin_professionals_subscribe', methods = ['GET', 'POST'])
@@ -97,7 +97,7 @@ def admin_professionals_subscribe():
     cur.execute(''' SELECT * FROM puesto''')
     r_job = cur.fetchall()
     cur.close()
-    return render_template('admin/admin_professionals_subscribe.html', active = 'admin_professionals', r_place = r_place, r_job = r_job)
+    return render_template('admin/professionals_subscribe.html', active = 'admin_professionals', r_place = r_place, r_job = r_job)
 
 @app.route('/admin_professionals_unsubscribe', methods = ['GET', 'POST'])
 def admin_professionals_unsubscribe():
@@ -120,39 +120,39 @@ def admin_professionals_unsubscribe():
     r_professionals = cur.fetchall()
     cur.close()
 
-    return render_template('admin/admin_professionals_unsubscribe.html', active = 'admin_professionals', r_professionals = r_professionals)
+    return render_template('admin/professionals_unsubscribe.html', active = 'admin_professionals', r_professionals = r_professionals)
 
 @app.route('/admin_professionals_modify')
 def admin_professionals_modify():
-    return render_template('admin/admin_professionals_modify.html', active = 'admin_professionals')
+    return render_template('admin/professionals_modify.html', active = 'admin_professionals')
 #End of professionals---------------------------------------
 
 #Beginning of students---------------------------------------
 @app.route('/admin_students_modify')
 def admin_students_modify():
-    return render_template('admin/admin_students_modify.html', active = 'admin_students')
+    return render_template('admin/students_modify.html', active = 'admin_students')
 
 @app.route('/admin_students_unsubscribe')
 def admin_students_unsubscribe():
-    return render_template('admin/admin_students_unsubscribe.html', active = 'admin_students')
+    return render_template('admin/students_unsubscribe.html', active = 'admin_students')
 #End of students---------------------------------------
 
 @app.route('/admin_schedule')
 def admin_schedule():
-    return render_template('admin/admin_schedule.html', active = 'admin_schedule')
+    return render_template('admin/schedule.html', active = 'admin_schedule')
 
 #Beginning of statistics---------------------------------------
 @app.route('/admin_statistics_general')
 def admin_statistics_general():
-    return render_template('admin/admin_statistics_general.html', active = 'admin_statistics')
+    return render_template('admin/statistics_general.html', active = 'admin_statistics')
 
 @app.route('/admin_statistics_professionals')
 def admin_statistics_professionals():
-    return render_template('admin/admin_statistics_professionals.html', active = 'admin_statistics')
+    return render_template('admin/statistics_professionals.html', active = 'admin_statistics')
 
 @app.route('/admin_statistics_canalization')
 def admin_statistics_canalization():
-    return render_template('admin/admin_statistics_canalization.html', active = 'admin_statistics')
+    return render_template('admin/statistics_canalization.html', active = 'admin_statistics')
 #End of statistics---------------------------------------
 # End of Admin Views ###########################################################################################
 
@@ -164,21 +164,21 @@ def professional_home():
         cur.execute(f'''SELECT NombreProf FROM profesionista WHERE RFC_Profesor = '{session['user']}' ''')
         professional_name = cur.fetchall()[0][0]
         cur.close()
-        return render_template('professional/professional_home.html', active = 'professional_home', professional_name = professional_name)
+        return render_template('professional/home.html', active = 'professional_home', professional_name = professional_name)
 
     return 'Necesitas iniciar sesión primero'
 
 @app.route('/professional_schedule')
 def professional_schedule():
     if 'user' in session:
-        return render_template('professional/professional_schedule.html', active = 'professional_schedule')
+        return render_template('professional/schedule.html', active = 'professional_schedule')
 
     return 'Necesitas iniciar sesión primero'
 
 @app.route('/professional_data')
 def professional_data():
     if 'user' in session:
-        return render_template('professional/professional_data.html', active = 'professional_data')
+        return render_template('professional/data.html', active = 'professional_data')
 
     return 'Necesitas iniciar sesión primero'
 
