@@ -31,16 +31,12 @@ def before_request():
     except:
         return 'No se puede conectar con la base de datos'
 
-@app.after_request
-def after_request(response):
-    global cur
-
+@app.teardown_request
+def teardown_request(error):
     try:
         cur.close()
     except:
         return 'No se pudo cerrar la conexión con la base de datos'
-
-    return response
 
 @app.route('/')
 def index():
