@@ -15,7 +15,7 @@ app.secret_key = os.urandom(24)
 app.config['MYSQL_HOST'] = '127.0.0.1'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'fis_practice'
+app.config['MYSQL_DB'] = 'sacda_5'
 mysql = MySQL(app)
 #use "mysql.connection.commit()" if you are making an insert into a table or an update (you need to tell mysql object to commit that query)
 
@@ -54,7 +54,7 @@ def login():
         password = request.form['password']
 
         try:
-            cur.execute(f''' SELECT ContraProf, sistema FROM profesionista WHERE RFC_Profesor = '{user}' ''')
+            cur.execute(f''' SELECT ContraProf, Sistema FROM profesionista WHERE RFC_Profesor = '{user}' ''')
             query_result = cur.fetchall()
             r_password = query_result[0][0]
             system_flag = query_result[0][1]
@@ -106,7 +106,7 @@ def admin_professionals_subscribe():
             return redirect(url_for('login'))
         else:
             try:
-                cur.execute(f''' SELECT cve_puesto FROM puesto WHERE desc_puesto = '{data['job']}' ''')
+                cur.execute(f''' SELECT CvePuesto FROM puesto WHERE DescPuesto = '{data['job']}' ''')
                 data['job'] = cur.fetchall()[0][0]
 
                 cur.execute(f''' SELECT CveLugar FROM lugar WHERE DescLugar = '{data['place']}' ''')
@@ -117,7 +117,7 @@ def admin_professionals_subscribe():
             data['password'] = generate_password_hash(data['password'], method = 'sha256')
 
             try:
-                cur.execute(f'''INSERT INTO profesionista VALUES('{data['rfc']}', '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', '{data['email']}', '{data['phone']}', '{data['rfc']}', {data['job']}, '{data['password']}', '{data['entry_time']}', '{data['exit_time']}', {data['place']}, 1)''')
+                cur.execute(f'''INSERT INTO profesionista VALUES('{data['rfc']}', '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', '{data['email']}', '{data['phone']}', '{data['rfc']}', {data['job']}, '{data['password']}', '{data['entry_time']}', '{data['exit_time']}', {data['place']}, 1, 1)''')
             except:
                 return 'Hubo un problema al guadar la información en la base de datos'
 
@@ -144,7 +144,7 @@ def admin_professionals_unsubscribe():
         professional_key = request.form['to_delete']
 
         try:
-            cur.execute(f''' UPDATE profesionista SET sistema = 0 WHERE RFC_Profesor = '{professional_key}' ''')
+            cur.execute(f''' UPDATE profesionista SET Sistema = 0 WHERE RFC_Profesor = '{professional_key}' ''')
         except:
             return 'Hubo un problema al actualizar la información en la base de datos'
 
@@ -153,7 +153,7 @@ def admin_professionals_unsubscribe():
         return redirect(url_for('admin_professionals_unsubscribe'))
 
     try:
-        cur.execute(''' SELECT RFC_Profesor, NombreProf, Primer_ApellidoP, Segundo_ApellidoP, puesto.desc_puesto, lugar.DescLugar, HorarioEntrada, HorarioSalida, CorreoP, TelProf FROM profesionista INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar INNER JOIN puesto ON profesionista.PuestoProf = puesto.cve_puesto WHERE sistema = 1''')
+        cur.execute(''' SELECT RFC_Profesor, NombreProf, Primer_ApellidoP, Segundo_ApellidoP, puesto.DescPuesto, lugar.DescLugar, HorarioEntrada, HorarioSalida, CorreoP, TelProf FROM profesionista INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar INNER JOIN puesto ON profesionista.Puesto = puesto.CvePuesto WHERE Sistema = 1''')
         r_professionals = cur.fetchall()
     except:
         return 'Hubo un problema al obtener la información de la base de datos'
