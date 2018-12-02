@@ -102,9 +102,19 @@ def admin_professionals_subscribe():
 
         #Check whether the fields are filled
         if '' in data.values():
-            #Teporary solution to check the validation (Must show a error message)
-            return redirect(url_for('login'))
+            return 'Los campos no pueden estar vacíos'
+        elif not data['phone'].isdigit():
+            return 'El campo teléfono solo debe contener dígitos'
         else:
+            try:
+                cur.execute(f''' SELECT NombreProf FROM profesionista WHERE RFC_Profesor= '{data['rfc']}' ''')
+                user = cur.fetchall()
+            except:
+                return 'Hubo un problema al guadar la información en la base de datos'
+
+            if user != ():
+                return 'Ya existe un usuario registrado con ese RFC'
+
             try:
                 cur.execute(f''' SELECT CvePuesto FROM puesto WHERE DescPuesto = '{data['job']}' ''')
                 data['job'] = cur.fetchall()[0][0]
