@@ -226,7 +226,14 @@ def professional_schedule():
 @app.route('/profesionista/datos')
 def professional_data():
     if 'user' in session:
-        return render_template('professional/data.html', active = 'professional_data')
+        try:
+            cur.execute(f'''SELECT NombreProf, Primer_ApellidoP , Segundo_ApellidoP, CorreoP, TelProf, DescPuesto, HorarioEntrada, HorarioSalida, DescLugar FROM profesionista INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar INNER JOIN puesto ON profesionista.Puesto = puesto.CvePuesto WHERE RFC_Profesor = '{session['user']}' ''')
+            professional_data = cur.fetchall()
+
+        except:
+            return 'Hubo un problema al guadar la información en la base de datos'
+
+        return render_template('professional/data.html', active = 'professional_data', professional_data = professional_data)
 
     return 'Necesitas iniciar sesión primero'
 

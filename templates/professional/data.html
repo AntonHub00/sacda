@@ -4,3 +4,16 @@
 Mis datos
 {% endblock title %}
 
+{% block content %}
+<div class="jumbotron">
+  <h1 class="display-4">Aquí están tus datos personales, {{ professional_data[0][0] }}:</h1>
+  <p class="data">Nombre completo: {{ professional_data[0][0] }} {{ professional_data[0][1] }} {{ professional_data[0][2] }}</p>
+  <p class="data">Correo electrónico: {{ professional_data[0][3] }}</p>
+  <p class="data">Puesto: {{ professional_data[0][4] }}</p>
+  <p class="data">Número de teléfono: {{ professional_data[0][5] }}</p>
+  <p class="data">Hora de entrada: {{ professional_data[0][6] }}     Hora de salida: {{ professional_data[0][7] }}</p>
+  <p class="data">Lugar: {{ professional_data[0][8] }}</p>
+  <hr class="my-4">
+  <p>SACDA es tu lugar para visualizar las citas agendadas por los alumnos del Instituto Tecnológico de Morelia interesados en este servicio</p>
+</div>
+{% endblock content %}
