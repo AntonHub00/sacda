@@ -10,42 +10,64 @@ app.secret_key = os.urandom(24)
 
 #check_password_hash(stored_password, password_given_in_form)
 
-#This data shouldn't be filled here (could use a yaml config file)
+#This data shouldn't be filled here (could use a yaml config file instead)
 #'localhost' doesn't work, just with '127.0.0.1' ('localhost' = '127.0.0.1')
 app.config['MYSQL_HOST'] = '127.0.0.1'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'fis_practice'
 mysql = MySQL(app)
-#use "mysql.connection.commit()" if you are making an insert into a table (you need to tell mysql object to commit that query)
+#use "mysql.connection.commit()" if you are making an insert into a table or an update (you need to tell mysql object to commit that query)
+
+#This global variable makes it posible to open/close database connection with before_request/after_request decorators
+cur = None
+
+@app.before_request
+def before_request():
+    global cur
+
+    try:
+        cur = mysql.connection.cursor()
+    except:
+        return 'No se puede conectar con la base de datos'
+
+@app.after_request
+def after_request(response):
+    global cur
+
+    try:
+        cur.close()
+    except:
+        return 'No se pudo cerrar la conexión con la base de datos'
+
+    return response
 
 @app.route('/')
 def index():
     return render_template('main/index.html')
 
-#JSON web tokens
-
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        cur = mysql.connection.cursor()
-
+        #TODO: Validate whether the user exists (could verify if rows (registers) > 0; it means user exists)
         user = request.form['user']
         password = request.form['password']
 
-        cur.execute(f''' SELECT ContraProf, sistema FROM profesionista WHERE RFC_Profesor = '{user}' ''')
-        query_result = cur.fetchall()
-        #TODO: Validate user exists (could verify if rows (registers) > 0; it means user exists)
-        r_password = query_result[0][0]
-        system_flag = query_result[0][1]
+        try:
+            cur.execute(f''' SELECT ContraProf, sistema FROM profesionista WHERE RFC_Profesor = '{user}' ''')
+            query_result = cur.fetchall()
+            r_password = query_result[0][0]
+            system_flag = query_result[0][1]
+        except:
+            return 'Hubo un problema al obtener la información de la base de datos'
 
-        cur.close()
-
+        #Checking if the password given is correct and is a registered user
         if check_password_hash(r_password, password) and system_flag == 1:
             session['user'] = user
 
     if 'user' in session:
         return redirect(url_for('professional_home'))
+
     return render_template('main/login.html')
 
 @app.route('/logout')
@@ -55,78 +77,86 @@ def logout():
 
     return redirect(url_for('login'))
 
-# Beginning of Admin Views ###########################################################################################
-@app.route('/administrador', methods = ['GET', 'POST'])
-@app.route('/administrador/', methods = ['GET', 'POST'])
-@app.route('/administrador/inicio', methods = ['GET', 'POST'])
+@app.route('/administrador')
+@app.route('/administrador/')
+@app.route('/administrador/inicio')
 def admin_home():
-    #if request.method == 'POST':
-    #    result = request.form['delete']
-    #    print(result)
-    #    if result == 'yes':
-    #        return 'The element has been deleted'
-    #    return 'The element has no changes'
     return render_template('admin/home.html', active = 'admin_home')
 
-#Beginning of professionals---------------------------------------
 @app.route('/administrador/profesionales/alta', methods = ['GET', 'POST'])
 def admin_professionals_subscribe():
     if request.method == 'POST':
-        cur = mysql.connection.cursor()
+        data = {}
 
-        name = request.form['name']
-        first_last_name = request.form['first_last_name']
-        second_last_name = request.form['second_last_name']
-        rfc = request.form['rfc']
-        email = request.form['email']
-        phone = request.form['phone']
-        job = request.form['job']
-        cur.execute(f''' SELECT cve_puesto FROM puesto WHERE desc_puesto = '{job}' ''')
-        job = cur.fetchall()[0][0]
-        entry_time = request.form['entry_time']
-        exit_time = request.form['exit_time']
-        place = request.form['place']
-        cur.execute(f''' SELECT CveLugar FROM lugar WHERE DescLugar = '{place}' ''')
-        place = cur.fetchall()[0][0]
-        password = generate_password_hash(request.form['password'], method = 'sha256')
+        data['name'] = request.form['name']
+        data['first_last_name'] = request.form['first_last_name']
+        data['second_last_name'] = request.form['second_last_name']
+        data['rfc'] = request.form['rfc']
+        data['email'] = request.form['email']
+        data['phone'] = request.form['phone']
+        data['job'] = request.form['job']
+        data['entry_time'] = request.form['entry_time']
+        data['exit_time'] = request.form['exit_time']
+        data['place'] = request.form['place']
+        data['password'] = request.form['password']
 
-        cur.execute(f'''INSERT INTO profesionista VALUES('{rfc}', '{name}', '{first_last_name}', '{second_last_name}', '{email}', '{phone}', '{rfc}', {job}, '{password}', '{entry_time}', '{exit_time}', {place}, 1)''')
-        mysql.connection.commit()
-        cur.close()
+        #Check whether the fields are filled
+        if '' in data.values():
+            #Teporary solution to check the validation (Must show a error message)
+            return redirect(url_for('login'))
+        else:
+            try:
+                cur.execute(f''' SELECT cve_puesto FROM puesto WHERE desc_puesto = '{data['job']}' ''')
+                data['job'] = cur.fetchall()[0][0]
 
-        #cur.execute(''' SELECT * FROM profesionista''')
-        #result_prof = cur.fetch_all()
-        return 'Done!'
-        #return result_prof
+                cur.execute(f''' SELECT CveLugar FROM lugar WHERE DescLugar = '{data['place']}' ''')
+                data['place'] = cur.fetchall()[0][0]
+            except:
+                return 'Hubo un problema al obtener la información de la base de datos'
 
-    cur = mysql.connection.cursor()
-    cur.execute(''' SELECT * FROM lugar''')
-    r_place = cur.fetchall()
-    cur.execute(''' SELECT * FROM puesto''')
-    r_job = cur.fetchall()
-    cur.close()
+            data['password'] = generate_password_hash(data['password'], method = 'sha256')
+
+            try:
+                cur.execute(f'''INSERT INTO profesionista VALUES('{data['rfc']}', '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', '{data['email']}', '{data['phone']}', '{data['rfc']}', {data['job']}, '{data['password']}', '{data['entry_time']}', '{data['exit_time']}', {data['place']}, 1)''')
+            except:
+                return 'Hubo un problema al guadar la información en la base de datos'
+
+            mysql.connection.commit()
+
+            #Implement message of success instead
+            return 'Profesionista registrado con éxito'
+
+    try:
+        cur.execute(''' SELECT * FROM lugar''')
+        r_place = cur.fetchall()
+
+        cur.execute(''' SELECT * FROM puesto''')
+        r_job = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+
     return render_template('admin/professionals_subscribe.html', active = 'admin_professionals', r_place = r_place, r_job = r_job)
 
 @app.route('/administrador/profesionales/baja', methods = ['GET', 'POST'])
 def admin_professionals_unsubscribe():
     if request.method == 'POST':
         professional_key = request.form['to_delete']
-        cur = mysql.connection.cursor()
-        cur.execute(f''' SELECT sistema FROM profesionista WHERE RFC_Profesor = '{professional_key}' ''')
-        in_system = cur.fetchall()[0][0]
-        cur.close()
-        if in_system == 1:
-            cur = mysql.connection.cursor()
+
+        try:
             cur.execute(f''' UPDATE profesionista SET sistema = 0 WHERE RFC_Profesor = '{professional_key}' ''')
-            mysql.connection.commit()
-            cur.close()
+        except:
+            return 'Hubo un problema al actualizar la información en la base de datos'
+
+        mysql.connection.commit()
 
         return redirect(url_for('admin_professionals_unsubscribe'))
 
-    cur = mysql.connection.cursor()
-    cur.execute(''' SELECT RFC_Profesor, NombreProf, Primer_ApellidoP, Segundo_ApellidoP, puesto.desc_puesto, lugar.DescLugar, HorarioEntrada, HorarioSalida, CorreoP, TelProf, sistema FROM profesionista INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar INNER JOIN puesto ON profesionista.PuestoProf = puesto.cve_puesto''')
-    r_professionals = cur.fetchall()
-    cur.close()
+    try:
+        cur.execute(''' SELECT RFC_Profesor, NombreProf, Primer_ApellidoP, Segundo_ApellidoP, puesto.desc_puesto, lugar.DescLugar, HorarioEntrada, HorarioSalida, CorreoP, TelProf FROM profesionista INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar INNER JOIN puesto ON profesionista.PuestoProf = puesto.cve_puesto WHERE sistema = 1''')
+        r_professionals = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
 
     return render_template('admin/professionals_unsubscribe.html', active = 'admin_professionals', r_professionals = r_professionals)
 
@@ -170,10 +200,12 @@ def admin_statistics_canalization():
 @app.route('/profesionista/inicio')
 def professional_home():
     if 'user' in session:
-        cur = mysql.connection.cursor()
-        cur.execute(f'''SELECT NombreProf FROM profesionista WHERE RFC_Profesor = '{session['user']}' ''')
-        professional_name = cur.fetchall()[0][0]
-        cur.close()
+        try:
+            cur.execute(f'''SELECT NombreProf FROM profesionista WHERE RFC_Profesor = '{session['user']}' ''')
+            professional_name = cur.fetchall()[0][0]
+        except:
+            return 'Hubo un problema al obtener la información de la base de datos'
+
         return render_template('professional/home.html', active = 'professional_home', professional_name = professional_name)
 
     return 'Necesitas iniciar sesión primero'
@@ -195,3 +227,4 @@ def professional_data():
 # End of Profesional Views ###########################################################################################
 if __name__ == '__main__':
     app.run(debug = True)
+

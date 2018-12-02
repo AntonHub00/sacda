@@ -2,44 +2,42 @@
 
 {% macro render_professionals() %}
 {% for professional in r_professionals %}
-  {% if professional[10] == 1%}
-  <tr>
-    <th scope="row">{{professional[0]}}</th>
-    <td>{{professional[1]}}</td>
-    <td>{{professional[2]}}</td>
-    <td>{{professional[3]}}</td>
-    <td>{{professional[4]}}</td>
-    <td>{{professional[5]}}</td>
-    <td>{{professional[6]}}</td>
-    <td>{{professional[7]}}</td>
-    <td>{{professional[8]}}</td>
-    <td>{{professional[9]}}</td>
-    <td>
-      <div class="modal" id="modal-professional-{{professional[0]}}" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Eliminar profesionista</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p>¿Deseas eliminar este profesionista?</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-              <form action="{{ url_for('admin_professionals_unsubscribe') }}" method="POST">
-                <button type="submit" class="btn btn-primary" name="to_delete" value="{{professional[0]}}"/>Eliminar</button>
-              </form>
-            </div>
+<tr>
+  <th scope="row">{{professional[0]}}</th>
+  <td>{{professional[1]}}</td>
+  <td>{{professional[2]}}</td>
+  <td>{{professional[3]}}</td>
+  <td>{{professional[4]}}</td>
+  <td>{{professional[5]}}</td>
+  <td>{{professional[6]}}</td>
+  <td>{{professional[7]}}</td>
+  <td>{{professional[8]}}</td>
+  <td>{{professional[9]}}</td>
+  <td>
+    <div class="modal" id="modal-professional-{{professional[0]}}" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Eliminar profesionista</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>¿Deseas eliminar este profesionista?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <form action="{{ url_for('admin_professionals_unsubscribe') }}" method="POST">
+              <button type="submit" class="btn btn-primary" name="to_delete" value="{{professional[0]}}"/>Eliminar</button>
+            </form>
           </div>
         </div>
       </div>
-      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-professional-{{professional[0]}}">Eliminar</button>
-    </td>
-  </tr>
-  {% endif %}
+    </div>
+    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-professional-{{professional[0]}}">Eliminar</button>
+  </td>
+</tr>
 {% endfor %}
 {% endmacro %}
 
