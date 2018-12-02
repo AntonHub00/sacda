@@ -1,0 +1,7 @@
+{% macro render_hours() %}
+{% for hour in range(7, 21) %}
+<option selected>{{ '{:02d}:00'.format(hour) }}</option>
+{% endfor %}
+{% endmacro %}
+
+

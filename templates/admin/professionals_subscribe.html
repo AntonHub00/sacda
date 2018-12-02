@@ -1,10 +1,6 @@
 {% extends 'admin/navbar.html' %}
 
-{% macro render_hours() %}
-{% for hour in range(7, 22) %}
-<option selected>{{ '{:02d}:00'.format(hour) }}</option>
-{% endfor %}
-{% endmacro %}
+{% from 'macros/_hours.html' import render_hours %}
 
 {% block title %}
 Registrar profesionistas
