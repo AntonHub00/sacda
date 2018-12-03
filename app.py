@@ -239,7 +239,7 @@ def admin_professionals_subscribe():
             except:
                 return 'Hubo un problema al guadar la información en la base de datos'
 
-            if user != ():
+            if user:
                 return 'Ya existe un usuario registrado con ese RFC'
 
             try:
@@ -340,7 +340,7 @@ def admin_students_subscribe():
             except:
                 return 'Hubo un problema al guadar la información en la base de datos'
 
-            if user != ():
+            if user:
                 return 'Ya existe un usuario registrado con esa matrícula'
 
             try:
