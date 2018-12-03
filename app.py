@@ -1,6 +1,7 @@
 from flask import Flask, render_template, session, request, redirect, url_for
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 import os
 
 app = Flask(__name__)
@@ -16,11 +17,41 @@ app.config['MYSQL_HOST'] = '127.0.0.1'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'sacda_5'
-mysql = MySQL(app)
-#use "mysql.connection.commit()" if you are making an insert into a table or an update (you need to tell mysql object to commit that query)
+mysql = MySQL(app) #use "mysql.connection.commit()" if you are making an insert into a table or an update (you need to tell mysql object to commit that query)
+cur = None #This global variable (cursor) makes it posible to open/close database connection with before_request/after_request decorators
+roles = {'professional' : 1, 'student' : 2, 'admin' : 3}
 
-#This global variable makes it posible to open/close database connection with before_request/after_request decorators
-cur = None
+def requires_access_level_and_session(access_level):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if 'user' not in session:
+                return redirect(url_for('login'))
+
+            try:
+                cur.execute(f''' SELECT Rol FROM profesionista WHERE RFC_Profesor = '{session['user']}' ''')
+                professional = cur.fetchall()
+
+                cur.execute(f''' SELECT Rol FROM administrador WHERE RFC_Prof = '{session['user']}' ''')
+                admin = cur.fetchall()
+
+                cur.execute(f''' SELECT Rol FROM alumno WHERE MatAlum = '{session['user']}' ''')
+                student = cur.fetchall()
+
+                if professional:
+                    role = professional[0][0]
+                elif admin:
+                    role = admin[0][0]
+                elif student:
+                    role = student[0][0]
+            except:
+                return 'Hubo un problema al obtener la información de la base de datos'
+
+            if role != access_level:
+                return 'No tienes permiso para acceder a esta página'
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 @app.before_request
 def before_request():
@@ -45,24 +76,41 @@ def index():
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        #TODO: Validate whether the user exists (could verify if rows (registers) > 0; it means user exists)
         user = request.form['user']
         password = request.form['password']
+        redirect_user = None
 
         try:
             cur.execute(f''' SELECT ContraProf, Sistema FROM profesionista WHERE RFC_Profesor = '{user}' ''')
-            query_result = cur.fetchall()
-            r_password = query_result[0][0]
-            system_flag = query_result[0][1]
+            professional = cur.fetchall()
+
+            cur.execute(f''' SELECT ContraAdmin FROM administrador WHERE RFC_Prof = '{user}' ''')
+            admin = cur.fetchall()
+
+            cur.execute(f''' SELECT ContraAlum FROM alumno WHERE MatAlum = '{user}' ''')
+            student = cur.fetchall()
+
+            if professional:
+                r_password = professional[0][0]
+                system_flag = professional[0][1]
+                redirect_user = 'professional_home'
+            elif admin:
+                r_password = admin[0][0]
+                redirect_user = 'admin_home'
+            elif student:
+                r_password = student[0][0]
+                redirect_user = 'login'
+            else:
+                return redirect(url_for('login'))
         except:
             return 'Hubo un problema al obtener la información de la base de datos'
 
         #Checking if the password given is correct and is a registered user
-        if check_password_hash(r_password, password) and system_flag == 1:
+        #TODO: add "in system" flags to student and admin
+        if check_password_hash(r_password, password):
             session['user'] = user
 
-    if 'user' in session:
-        return redirect(url_for('professional_home'))
+        return redirect(url_for(redirect_user))
 
     return render_template('main/login.html')
 
@@ -76,10 +124,12 @@ def logout():
 @app.route('/administrador')
 @app.route('/administrador/')
 @app.route('/administrador/inicio')
+@requires_access_level_and_session(roles['admin'])
 def admin_home():
     return render_template('admin/home.html', active = 'admin_home')
 
 @app.route('/administrador/profesionales/alta', methods = ['GET', 'POST'])
+@requires_access_level_and_session(roles['admin'])
 def admin_professionals_subscribe():
     if request.method == 'POST':
         data = {}
@@ -145,6 +195,7 @@ def admin_professionals_subscribe():
     return render_template('admin/professionals_subscribe.html', active = 'admin_professionals', r_place = r_place, r_job = r_job)
 
 @app.route('/administrador/profesionales/baja', methods = ['GET', 'POST'])
+@requires_access_level_and_session(roles['admin'])
 def admin_professionals_unsubscribe():
     if request.method == 'POST':
         professional_key = request.form['to_delete']
@@ -167,77 +218,69 @@ def admin_professionals_unsubscribe():
     return render_template('admin/professionals_unsubscribe.html', active = 'admin_professionals', r_professionals = r_professionals)
 
 @app.route('/administrador/profesionales/modificar')
+@requires_access_level_and_session(roles['admin'])
 def admin_professionals_modify():
     return render_template('admin/professionals_modify.html', active = 'admin_professionals')
-#End of professionals---------------------------------------
 
-#Beginning of students---------------------------------------
 @app.route('/administrador/estudiantes/modificar')
+@requires_access_level_and_session(roles['admin'])
 def admin_students_modify():
     return render_template('admin/students_modify.html', active = 'admin_students')
 
 @app.route('/administrador/estudiantes/baja')
+@requires_access_level_and_session(roles['admin'])
 def admin_students_unsubscribe():
     return render_template('admin/students_unsubscribe.html', active = 'admin_students')
-#End of students---------------------------------------
 
 @app.route('/administrador/agendas')
+@requires_access_level_and_session(roles['admin'])
 def admin_schedule():
     return render_template('admin/schedule.html', active = 'admin_schedule')
 
-#Beginning of statistics---------------------------------------
 @app.route('/administrador/estadisticas/generales')
+@requires_access_level_and_session(roles['admin'])
 def admin_statistics_general():
     return render_template('admin/statistics_general.html', active = 'admin_statistics')
 
 @app.route('/administrador/estadisticas/profesionistas')
+@requires_access_level_and_session(roles['admin'])
 def admin_statistics_professionals():
     return render_template('admin/statistics_professionals.html', active = 'admin_statistics')
 
 @app.route('/administrador/estadisticas/canalizaciones')
+@requires_access_level_and_session(roles['admin'])
 def admin_statistics_canalization():
     return render_template('admin/statistics_canalization.html', active = 'admin_statistics')
-#End of statistics---------------------------------------
-# End of Admin Views ###########################################################################################
 
-# Beginning of Profesional Views ###########################################################################################
 @app.route('/profesionista')
 @app.route('/profesionista/')
 @app.route('/profesionista/inicio')
+@requires_access_level_and_session(roles['professional'])
 def professional_home():
-    if 'user' in session:
-        try:
-            cur.execute(f'''SELECT NombreProf FROM profesionista WHERE RFC_Profesor = '{session['user']}' ''')
-            professional_name = cur.fetchall()[0][0]
-        except:
-            return 'Hubo un problema al obtener la información de la base de datos'
+    try:
+        cur.execute(f'''SELECT NombreProf FROM profesionista WHERE RFC_Profesor = '{session['user']}' ''')
+        professional_name = cur.fetchall()[0][0]
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
 
-        return render_template('professional/home.html', active = 'professional_home', professional_name = professional_name)
-
-    return 'Necesitas iniciar sesión primero'
+    return render_template('professional/home.html', active = 'professional_home', professional_name = professional_name)
 
 @app.route('/profesionista/agenda')
+@requires_access_level_and_session(roles['professional'])
 def professional_schedule():
-    if 'user' in session:
-        return render_template('professional/schedule.html', active = 'professional_schedule')
-
-    return 'Necesitas iniciar sesión primero'
+    return render_template('professional/schedule.html', active = 'professional_schedule')
 
 @app.route('/profesionista/datos')
+@requires_access_level_and_session(roles['professional'])
 def professional_data():
-    if 'user' in session:
-        try:
-            cur.execute(f'''SELECT NombreProf, Primer_ApellidoP , Segundo_ApellidoP, CorreoP, TelProf, DescPuesto, HorarioEntrada, HorarioSalida, DescLugar FROM profesionista INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar INNER JOIN puesto ON profesionista.Puesto = puesto.CvePuesto WHERE RFC_Profesor = '{session['user']}' ''')
-            professional_data = cur.fetchall()
+    try:
+        cur.execute(f'''SELECT NombreProf, Primer_ApellidoP , Segundo_ApellidoP, CorreoP, TelProf, DescPuesto, HorarioEntrada, HorarioSalida, DescLugar FROM profesionista INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar INNER JOIN puesto ON profesionista.Puesto = puesto.CvePuesto WHERE RFC_Profesor = '{session['user']}' ''')
+        professional_data = cur.fetchall()
+    except:
+        return 'Hubo un problema al guadar la información en la base de datos'
 
-        except:
-            return 'Hubo un problema al guadar la información en la base de datos'
+    return render_template('professional/data.html', active = 'professional_data', professional_data = professional_data)
 
-        return render_template('professional/data.html', active = 'professional_data', professional_data = professional_data)
-
-    return 'Necesitas iniciar sesión primero'
-
-# End of Profesional Views ###########################################################################################
 if __name__ == '__main__':
     app.run(debug = True)
 
