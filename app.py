@@ -1,5 +1,7 @@
 from flask import Flask, render_template, session, request, redirect, url_for
 from flask_mysqldb import MySQL
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import os
@@ -9,17 +11,26 @@ app = Flask(__name__)
 #secret_key function is needed for session handling
 app.secret_key = os.urandom(24)
 
-#check_password_hash(stored_password, password_given_in_form)
+#This data shouldn't be filled here (could use a yaml config file instead)
+#Email configuration
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'test.app.flask@gmail.com'
+app.config['MAIL_PASSWORD'] = 'test_app_123'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
 
 #This data shouldn't be filled here (could use a yaml config file instead)
-#'localhost' doesn't work, just with '127.0.0.1' ('localhost' = '127.0.0.1')
 app.config['MYSQL_HOST'] = '127.0.0.1'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'sacda_5'
-mysql = MySQL(app) #use "mysql.connection.commit()" if you are making an insert into a table or an update (you need to tell mysql object to commit that query)
+
+mysql = MySQL(app)
+mail = Mail(app)
 cur = None #This global variable (cursor) makes it posible to open/close database connection with before_request/after_request decorators
 roles = {'professional' : 1, 'student' : 2, 'admin' : 3}
+serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 def requires_access_level_and_session(access_level):
     def decorator(f):
@@ -68,6 +79,76 @@ def teardown_request(error):
         cur.close()
     except:
         return 'No se pudo cerrar la conexión con la base de datos'
+
+@app.route('/restablecer', methods = ['GET', 'POST'])
+def reset_password():
+    if request.method == 'POST':
+        user = request.form['user']
+
+        try:
+            cur.execute(f''' SELECT CorreoP, NombreProf FROM profesionista WHERE RFC_Profesor = '{user}' ''')
+            professional = cur.fetchall()
+
+            cur.execute(f''' SELECT CorreoAdmin, NombreAdm FROM administrador WHERE RFC_Prof = '{user}' ''')
+            admin = cur.fetchall()
+
+            cur.execute(f''' SELECT CorreoAlum, NombreAlum FROM alumno WHERE MatAlum = '{user}' ''')
+            student = cur.fetchall()
+
+            if professional:
+                user_mail = professional[0][0]
+                user_name = professional[0][1]
+                user_identifier_field = 'RFC_Profesor'
+                user_role_field = 'profesionista'
+                user_password_field = 'ContraProf'
+            elif admin:
+                user_mail = admin[0][0]
+                user_name = admin[0][1]
+                user_identifier_field = 'RFC_Prof'
+                user_role_field = 'administrador'
+                user_password_field = 'ContraAdmin'
+            elif student:
+                user_mail = student[0][0]
+                user_name = student[0][1]
+                user_identifier_field = 'MatAlum'
+                user_role_field = 'alumno'
+                user_password_field = 'ContraAlum'
+            else:
+                return render_template('main/reset_password.html', sent = False)
+        except:
+            return 'Hubo un problema al obtener la información de la base de datos'
+
+        user_data = {'user': user, 'identifier_field' : user_identifier_field, 'role_field' : user_role_field, 'password_field' : user_password_field}
+        token =  serializer.dumps(user_data, salt = 'reset-password')
+        link = url_for('change_password', token = token, _external = True)
+
+        msg = Message('Restablecimiento de contraseña SACDA', sender = 'test.app.flask@gmail.com', recipients = [user_mail])
+        msg.body = f'Hola {user_name}. Necesitas entrar a este link para poder restablecer tu contraseña (solo funcionará por 15 minutos): {link}'
+        mail.send(msg)
+
+        return render_template('main/reset_password.html', sent = True)
+
+    return render_template('main/reset_password.html', sent = 'unknown')
+
+@app.route('/restablecer/<token>', methods = ['GET', 'POST'])
+def change_password(token):
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+
+        try:
+            user_data = serializer.loads(token, salt = 'reset-password', max_age = 900)
+        except SignatureExpired:
+            return 'Esta página ya no se encuentra disponible (tiempo excedido)'
+        except BadTimeSignature:
+            return 'El link de verificación no es correcto o fue alterado'
+
+        new_password = generate_password_hash(new_password, method = 'sha256')
+        cur.execute(f''' UPDATE {user_data['role_field']} SET {user_data['password_field']} = '{new_password}' WHERE {user_data['identifier_field']} = '{user_data['user']}' ''')
+        mysql.connection.commit()
+
+        return redirect(url_for('login'))
+
+    return render_template('main/change_password.html', token = token)
 
 @app.route('/')
 def index():
