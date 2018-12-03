@@ -316,7 +316,7 @@ def admin_students_subscribe():
         data['email'] = request.form['email']
         data['phone'] = request.form['phone']
         data['career'] = request.form['career']
-        data['sex'] = request.form['sex']
+        data['gender'] = request.form['gender']
         data['semester'] = request.form['semester']
         data['password'] = request.form['password']
         #Tutor
@@ -331,6 +331,8 @@ def admin_students_subscribe():
             return 'Los campos no pueden estar vacíos'
         elif not data['phone'].isdigit():
             return 'El campo teléfono solo debe contener dígitos'
+        elif not data['enrollment'].isdigit():
+            return 'El campo matrícula solo debe contener dígitos'
         else:
             try:
                 cur.execute(f''' SELECT NombreAlum FROM alumno WHERE MatAlum= '{data['enrollment']}' ''')
@@ -350,7 +352,7 @@ def admin_students_subscribe():
             data['password'] = generate_password_hash(data['password'], method = 'sha256')
 
             try:
-                cur.execute(f'''INSERT INTO alumno VALUES('{data['enrollment']}', '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', {data['career']}, '{data['semester']}', '{data['email']}', '{data['phone']}', '{data['sex']}', '{data['password']}', '{data['name_tutor']}', '{data['first_last_name_tutor']}', '{data['second_last_name_tutor']}', '{data['phone_tutor']}', '{data['email_tutor']}', 1)''')
+                cur.execute(f'''INSERT INTO alumno VALUES({data['enrollment']}, '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', {data['career']}, {data['semester']}, '{data['email']}', '{data['phone']}', '{data['gender']}', '{data['password']}', '{data['name_tutor']}', '{data['first_last_name_tutor']}', '{data['second_last_name_tutor']}', '{data['phone_tutor']}', '{data['email_tutor']}', 2)''')
             except:
                 return 'Hubo un problema al guadar la información en la base de datos'
 
