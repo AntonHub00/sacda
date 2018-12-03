@@ -45,9 +45,11 @@
         Alumnos
       </a>
       <div class="dropdown-menu" aria-labelledby="navbarDropdownStudents">
-        <a class="dropdown-item text-center" href="{{ url_for('admin_students_modify') }}">Modificar</a>
+        <a class="dropdown-item text-center" href="{{ url_for('admin_students_subscribe') }}">Dar de alta</a>
         <div class="dropdown-divider"></div>
         <a class="dropdown-item text-center" href="{{ url_for('admin_students_unsubscribe') }}">Dar de baja</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item text-center" href="{{ url_for('admin_students_modify') }}">Modificar</a>
       </div>
     </div>
     <!-- End div of the statistics dropdown menu-->

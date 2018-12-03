@@ -302,7 +302,72 @@ def admin_professionals_unsubscribe():
 @requires_access_level_and_session(roles['admin'])
 def admin_professionals_modify():
     return render_template('admin/professionals_modify.html', active = 'admin_professionals')
+#INICIO
+@app.route('/administrador/estudiantes/alta', methods = ['GET', 'POST'])
+@requires_access_level_and_session(roles['admin'])
+def admin_students_subscribe():
+    if request.method == 'POST':
+        data = {}
 
+        data['name'] = request.form['name']
+        data['first_last_name'] = request.form['first_last_name']
+        data['second_last_name'] = request.form['second_last_name']
+        data['enrollment'] = request.form['enrollment']
+        data['email'] = request.form['email']
+        data['phone'] = request.form['phone']
+        data['career'] = request.form['career']
+        data['sex'] = request.form['sex']
+        data['semester'] = request.form['semester']
+        data['password'] = request.form['password']
+        #Tutor
+        data['name_tutor'] = request.form['name_tutor']
+        data['first_last_name_tutor'] = request.form['first_last_name_tutor']
+        data['second_last_name_tutor'] = request.form['second_last_name_tutor']
+        data['phone_tutor'] = request.form['phone_tutor']
+        data['email_tutor'] = request.form['email_tutor']
+
+        #Check whether the fields are filled
+        if '' in data.values():
+            return 'Los campos no pueden estar vacíos'
+        elif not data['phone'].isdigit():
+            return 'El campo teléfono solo debe contener dígitos'
+        else:
+            try:
+                cur.execute(f''' SELECT NombreAlum FROM alumno WHERE MatAlum= '{data['enrollment']}' ''')
+                user = cur.fetchall()
+            except:
+                return 'Hubo un problema al guadar la información en la base de datos'
+
+            if user != ():
+                return 'Ya existe un usuario registrado con esa matrícula'
+
+            try:
+                cur.execute(f''' SELECT CveCarrera FROM carreras WHERE DescripcionCarrera = '{data['career']}' ''')
+                data['career'] = cur.fetchall()[0][0]
+            except:
+                return 'Hubo un problema al obtener la información de la base de datos'
+
+            data['password'] = generate_password_hash(data['password'], method = 'sha256')
+
+            try:
+                cur.execute(f'''INSERT INTO alumno VALUES('{data['enrollment']}', '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', {data['career']}, '{data['semester']}', '{data['email']}', '{data['phone']}', '{data['sex']}', '{data['password']}', '{data['name_tutor']}', '{data['first_last_name_tutor']}', '{data['second_last_name_tutor']}', '{data['phone_tutor']}', '{data['email_tutor']}', 1)''')
+            except:
+                return 'Hubo un problema al guadar la información en la base de datos'
+
+            mysql.connection.commit()
+
+            #Implement message of success instead
+            return 'Alumno registrado con éxito'
+
+    try:
+        cur.execute(''' SELECT * FROM carreras''')
+        r_career = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+
+    return render_template('admin/students_subscribe.html', active = 'admin_students', r_career = r_career)
+    #FIN
 @app.route('/administrador/estudiantes/modificar')
 @requires_access_level_and_session(roles['admin'])
 def admin_students_modify():
