@@ -180,7 +180,7 @@ def login():
                 redirect_user = 'admin_home'
             elif student:
                 r_password = student[0][0]
-                redirect_user = 'login'
+                redirect_user = 'student_home'
             else:
                 return redirect(url_for('login'))
         except:
@@ -428,6 +428,35 @@ def professional_data():
         return 'Hubo un problema al guadar la información en la base de datos'
 
     return render_template('professional/data.html', active = 'professional_data', professional_data = professional_data)
+
+@app.route('/alumno')
+@app.route('/alumno/')
+@app.route('/alumno/inicio')
+@requires_access_level_and_session(roles['student'])
+def student_home():
+    try:
+        cur.execute(f'''SELECT NombreAlum FROM alumno WHERE MatAlum = '{session['user']}' ''')
+        student_name = cur.fetchall()[0][0]
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('student/home.html', active = 'student_home', student_name = student_name)
+
+@app.route('/alumno/agenda')
+@requires_access_level_and_session(roles['student'])
+def student_schedule():
+    return render_template('student/schedule.html', active = 'student_schedule')
+
+@app.route('/alumno/datos')
+@requires_access_level_and_session(roles['student'])
+def student_data():
+    try:
+        cur.execute(f'''SELECT NombreAlum, Primer_ApellidoA, Segundo_ApellidoA, DescripcionCarrera, Semestre, CorreoAlum, TelAlum, SexoA, NombreTutor, Primer_ApellidoT, Segundo_ApellidoT, TelTutor, CorreoTutor FROM alumno INNER JOIN carreras ON alumno.Carrera = carreras.CveCarrera WHERE MatAlum = {session['user']} ''')
+        student_data = cur.fetchall()
+    except:
+        return 'Hubo un problema al guadar la información en la base de datos'
+
+    return render_template('student/data.html', active = 'student_data', student_data = student_data)
 
 if __name__ == '__main__':
     app.run(debug = True)

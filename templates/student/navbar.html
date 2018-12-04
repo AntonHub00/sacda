@@ -1,0 +1,39 @@
+{% extends 'main/base_navbar.html' %}
+
+{% block home_logo %}
+{{url_for('student_home')}}
+{% endblock home_logo %}
+
+{% block navbar_items %}
+<div class="collapse navbar-collapse" id="navbarId">
+  <div class="navbar-nav mr-auto">
+
+    {% if active == 'student_home' %}
+      <a class="nav-item nav-link active text-center" href="{{ url_for('student_home') }}">Inicio</a>
+    {% else %}
+      <a class="nav-item nav-link text-center" href="{{ url_for('student_home') }}">Inicio</a>
+    {% endif %}
+
+    {% if active == 'student_schedule' %}
+    <a class="nav-item nav-link active text-center" href="{{ url_for('student_schedule') }}">Agenda</a>
+    {% else %}
+    <a class="nav-item nav-link text-center" href="{{ url_for('student_schedule') }}">Agenda</a>
+    {% endif %}
+
+    {% if active == 'student_data' %}
+    <a class="nav-item nav-link active text-center" href="{{ url_for('student_data') }}">Mis datos</a>
+    {% else %}
+    <a class="nav-item nav-link text-center" href="{{ url_for('student_data') }}">Mis datos</a>
+    {% endif %}
+    <!-- End div of the statistics dropdown menu-->
+  </div>
+
+  <!-- Log out -->
+  <div class="navbar-nav">
+    <a class="nav-item nav-link text-center" href="{{ url_for('logout') }}">Cerrar sesión</a>
+  </div>
+</div>
+{% endblock navbar_items %}
+
+
+

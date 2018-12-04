@@ -1,0 +1,14 @@
+{% extends 'student/navbar.html' %}
+
+{% block title %}
+Inicio
+{% endblock title %}
+
+{% block content %}
+<div class="jumbotron">
+  <h1 class="display-4">Bienvenido!</h1>
+  <p class="lead">Un gusto tenerte por aquí, {{ student_name }}</p>
+  <hr class="my-4">
+  <p>SACDA es tu lugar para visualizar las citas agendadas por los alumnos del Instituto Tecnológico de Morelia interesados en este servicio</p>
+</div>
+{% endblock content %}
