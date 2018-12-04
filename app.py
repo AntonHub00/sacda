@@ -229,18 +229,17 @@ def admin_professionals_subscribe():
 
         #Check whether the fields are filled
         if '' in data.values():
-            return 'Los campos no pueden estar vacíos'
+            return render_template('admin/professionals_subscribe.html', sent = 1)
         elif not data['phone'].isdigit():
-            return 'El campo teléfono solo debe contener dígitos'
+            return render_template('admin/professionals_subscribe.html', sent = 2)
         else:
             try:
                 cur.execute(f''' SELECT NombreProf FROM profesionista WHERE RFC_Profesor= '{data['rfc']}' ''')
                 user = cur.fetchall()
             except:
-                return 'Hubo un problema al guadar la información en la base de datos'
-
+                return render_template('admin/professionals_subscribe.html', sent = 3)
             if user:
-                return 'Ya existe un usuario registrado con ese RFC'
+                return render_template('admin/professionals_subscribe.html', sent = 4)
 
             try:
                 cur.execute(f''' SELECT CvePuesto FROM puesto WHERE DescPuesto = '{data['job']}' ''')
@@ -249,19 +248,19 @@ def admin_professionals_subscribe():
                 cur.execute(f''' SELECT CveLugar FROM lugar WHERE DescLugar = '{data['place']}' ''')
                 data['place'] = cur.fetchall()[0][0]
             except:
-                return 'Hubo un problema al obtener la información de la base de datos'
+                return render_template('admin/professionals_subscribe.html', sent = 5)
 
             data['password'] = generate_password_hash(data['password'], method = 'sha256')
 
             try:
                 cur.execute(f'''INSERT INTO profesionista VALUES('{data['rfc']}', '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', '{data['email']}', '{data['phone']}', '{data['rfc']}', {data['job']}, '{data['password']}', '{data['entry_time']}', '{data['exit_time']}', {data['place']}, 1, 1)''')
             except:
-                return 'Hubo un problema al guadar la información en la base de datos'
+                return render_template('admin/professionals_subscribe.html', sent = 3)
 
             mysql.connection.commit()
 
             #Implement message of success instead
-            return 'Profesionista registrado con éxito'
+            return render_template('admin/professionals_subscribe.htlm', sent = 6)
 
     try:
         cur.execute(''' SELECT * FROM lugar''')
@@ -352,7 +351,7 @@ def admin_students_subscribe():
             data['password'] = generate_password_hash(data['password'], method = 'sha256')
 
             try:
-                cur.execute(f'''INSERT INTO alumno VALUES({data['enrollment']}, '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', {data['career']}, {data['semester']}, '{data['email']}', '{data['phone']}', '{data['gender']}', '{data['password']}', '{data['name_tutor']}', '{data['first_last_name_tutor']}', '{data['second_last_name_tutor']}', '{data['phone_tutor']}', '{data['email_tutor']}', 2)''')
+                cur.execute(f'''INSERT INTO alumno VALUES({data['enrollment']}, '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', {data['career']}, {data['semester']}, '{data['email']}', '{data['phone']}', '{data['gender']}', '{data['password']}', '{data['name_tutor']}', '{data['first_last_name_tutor']}', '{data['second_last_name_tutor']}', '{data['phone_tutor']}', '{data['email_tutor']}', 2,1)''')
             except:
                 return 'Hubo un problema al guadar la información en la base de datos'
 
@@ -375,10 +374,28 @@ def admin_students_subscribe():
 def admin_students_modify():
     return render_template('admin/students_modify.html', active = 'admin_students')
 
-@app.route('/administrador/estudiantes/baja')
+@app.route('/administrador/estudiantes/baja', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
 def admin_students_unsubscribe():
-    return render_template('admin/students_unsubscribe.html', active = 'admin_students')
+    if request.method == 'POST':
+        student_key = request.form['to_delete']
+
+        try:
+            cur.execute(f''' UPDATE alumno SET Sistema = 0 WHERE MatAlum = '{student_key}' ''')
+        except:
+            return 'Hubo un problema al actualizar la información en la base de datos'
+
+        mysql.connection.commit()
+
+        return redirect(url_for('admin_students_unsubscribe'))
+
+    try:
+        cur.execute(''' SELECT MatAlum, NombreAlum, Primer_ApellidoA, Segundo_ApellidoA, DescripcionCarrera, Semestre, CorreoAlum, TelAlum FROM alumno INNER JOIN carreras ON alumno.Carrera = carreras.CveCarrera WHERE Sistema = 1 ''')
+        r_students = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('admin/students_unsubscribe.html', active = 'admin_students', r_students = r_students)
 
 @app.route('/administrador/agendas')
 @requires_access_level_and_session(roles['admin'])
