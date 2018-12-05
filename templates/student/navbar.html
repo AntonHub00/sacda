@@ -14,10 +14,10 @@
       <a class="nav-item nav-link text-center" href="{{ url_for('student_home') }}">Inicio</a>
     {% endif %}
 
-    {% if active == 'student_schedule' %}
-    <a class="nav-item nav-link active text-center" href="{{ url_for('student_schedule') }}">Agenda</a>
+    {% if active == 'student_schedule_professionals' %}
+    <a class="nav-item nav-link active text-center" href="{{ url_for('student_schedule_professionals') }}">Agenda</a>
     {% else %}
-    <a class="nav-item nav-link text-center" href="{{ url_for('student_schedule') }}">Agenda</a>
+    <a class="nav-item nav-link text-center" href="{{ url_for('student_schedule_professionals') }}">Agenda</a>
     {% endif %}
 
     {% if active == 'student_data' %}

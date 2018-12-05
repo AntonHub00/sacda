@@ -1,0 +1,39 @@
+{% extends 'admin/navbar.html' %}
+
+{% macro render_dates %}
+{% for date in r_dates %}
+<tr>
+  <td>{{date[1]}}</td>
+  <td>{{date[2]}}</td>
+  <td>{{date[3]}}</td>
+  <td>{{date[4]}}</td>
+  <td>{{date[5]}}</td>
+</tr>
+{% endfor %}
+{% endmacro %}
+
+
+{% block other_content  %}
+<div clas = "">
+	Paso1.- Elige un profesionista
+</div>
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead class="thead-dark">
+      <tr class="text-center">
+        <th scope="col">Fecha</th>
+        <th scope="col">Hora</th>
+        <th scope="col">Observaciones</th>
+        <th scope="col">Alumno</th>
+        <th scope="col"></th>
+        <th scope="col">   </th>
+        <th scope="col">   </th>
+
+      </tr>
+    </thead>
+    <tbody class="text-center">
+      {{ render_dates() }}
+    </tbody>
+  </table>
+</div>
+{% endblock other_content  %}

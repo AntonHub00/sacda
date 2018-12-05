@@ -397,10 +397,34 @@ def admin_students_unsubscribe():
 
     return render_template('admin/students_unsubscribe.html', active = 'admin_students', r_students = r_students)
 
-@app.route('/administrador/agendas')
+@app.route('/administrador/agendas', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
 def admin_schedule():
-    return render_template('admin/schedule.html', active = 'admin_schedule')
+    if request.method == 'POST':
+        professional_key = request.form['to_select']
+
+        return redirect(url_for('admin_schedule_personal', professional_key = professional_key))
+        
+    try:
+        cur.execute(''' SELECT RFC_Profesor, NombreProf, Primer_ApellidoP, Segundo_ApellidoP, puesto.DescPuesto, lugar.DescLugar FROM profesionista INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar INNER JOIN puesto ON profesionista.Puesto = puesto.CvePuesto WHERE Sistema = 1 ''')
+        r_professionals = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('admin/schedule.html', active = 'admin_schedule', r_professionals = r_professionals)
+
+@app.route('/administrador/agendas/professional_name')
+@requires_access_level_and_session(roles['admin'])
+def admin_schedule_personal():
+    professional_key = request.args.get('professional_key')
+    try:
+        cur.execute(''' SELECT FechaCita, HoraCita,ObservacionCita, MatAlum FROM `cita` INNER JOIN alummno ON cita.MatAlum = alumno.MatAlum WHERE CveProf = {professional_key}''')
+        r_dates = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+
+    return render_template('admin/schedule_personal.html', active = 'admin_schedule', r_dates = r_dates)
 
 @app.route('/administrador/estadisticas/generales')
 @requires_access_level_and_session(roles['admin'])
@@ -459,9 +483,33 @@ def student_home():
 
     return render_template('student/home.html', active = 'student_home', student_name = student_name)
 
-@app.route('/alumno/agenda')
+@app.route('/alumno/agenda/', methods = ['GET', 'POST'])
+@requires_access_level_and_session(roles['student'])
+def student_schedule_professionals():
+    if request.method == 'POST':
+        professional_key = request.form['to_select']
+
+        return redirect(url_for('student_schedule', professional_key = professional_key))
+    try:
+        cur.execute(''' SELECT RFC_Profesor, NombreProf, Primer_ApellidoP, Segundo_ApellidoP, puesto.DescPuesto, lugar.DescLugar FROM profesionista INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar INNER JOIN puesto ON profesionista.Puesto = puesto.CvePuesto WHERE Sistema = 1 ''')
+        r_professionals = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('student/schedule_professionals.html', active = 'student_schedule', r_professionals = r_professionals)
+
+@app.route('/alumno/agenda/date', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['student'])
 def student_schedule():
+    professional_key = request.args.get('professional_key')
+    if request.method == 'POST':
+
+        try:
+            cur.execute(f'''INSERT INTO `cita` VALUES (,'{request.form['Date']}','{request.form['entry_time']}', '{professional_key}',{session['user']},'{Hora}',' ')''')
+        except:
+            return 'Hubo un problema al agendar la cita'
+        return redirect(url_for('student_schedule'))
+
     return render_template('student/schedule.html', active = 'student_schedule')
 
 @app.route('/alumno/datos')
