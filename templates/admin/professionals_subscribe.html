@@ -6,8 +6,58 @@
 Registrar profesionistas
 {% endblock title %}
 
-
 {% block content %}
+{% if sent == 1 %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  Los campos no pueden estar vacíos
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{%endif%}
+{% if sent == 2 %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  El campo teléfono solo debe contener dígitos
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif%}
+{% if sent == 3 %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  Hubo un problema al guadar la información en la base de datos
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif%}
+{% if sent == 4 %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  Ya existe un usuario registrado con ese RFC
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif%}
+{% if sent == 5 %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  Hubo un problema al obtener la información de la base de datos
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif%}
+{% if sent == 6 %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  El profesionista fue registrado con Éxito
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif%}
+
+
+
 <form method="POST" action="{{ url_for('admin_professionals_subscribe') }}">
   <div class="form-row">
     <div class="form-group col-md-4">

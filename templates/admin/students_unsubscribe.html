@@ -1,5 +1,68 @@
 {% extends 'admin/navbar.html' %}
 
+{% macro render_students() %}
+{% for student in r_students %}
+<tr>
+  <th scope="row">{{student[0]}}</th>
+  <td>{{student[1]}}</td>
+  <td>{{student[2]}}</td>
+  <td>{{student[3]}}</td>
+  <td>{{student[4]}}</td>
+  <td>{{student[5]}}</td>
+  <td>{{student[6]}}</td>
+  <td>{{student[7]}}</td>
+  <td>
+    <div class="modal" id="modal-student-{{student[0]}}" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Eliminar Alumno</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>¿Deseas eliminar este profesionista?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <form action="{{ url_for('admin_students_unsubscribe') }}" method="POST">
+              <button type="submit" class="btn btn-primary" name="to_delete" value="{{student[0]}}"/>Eliminar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-student-{{student[0]}}">Eliminar</button>
+  </td>
+</tr>
+{% endfor %}
+{% endmacro %}
+
 {% block title %}
 Dar de baja estudiantes
 {% endblock title %}
+
+
+{% block other_content  %}
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead class="thead-dark">
+      <tr class="text-center">
+        <th scope="col">Matrícula</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">Apellido Paterno</th>
+        <th scope="col">Apellido Materno</th>
+        <th scope="col">Carrera</th>
+        <th scope="col">Semestre</th>
+        <th scope="col">Correo</th>
+        <th scope="col">Teléfono</th>
+        <th scope="col">Eliminar</th>
+      </tr>
+    </thead>
+    <tbody class="text-center">
+      {{ render_students() }}
+    </tbody>
+  </table>
+</div>
+{% endblock other_content %}
