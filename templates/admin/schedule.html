@@ -4,6 +4,41 @@
 Agendas
 {% endblock title %}
 
-{% block other_content  %}
+{% block content %}
+{% macro render_schedule() %}
+{% for schedule in r_schedules %}
+<tr>
+  <th scope="row">{schedule[0]}}</th>
+  <td>{{schedule[1]}}</td>
+  <td>{{schedule[2]}}</td>
+  <td>{{schedule[3]}}</td>
+  <td>{{schedule[4]}}</td>
+  <td>
+    <div class="modal" id="modal-professional-{{professional[0]}}" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Eliminar profesionista</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>¿Deseas eliminar este profesionista?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <form action="{{ url_for('admin_professionals_unsubscribe') }}" method="POST">
+              <button type="submit" class="btn btn-primary" name="to_delete" value="{{professional[0]}}"/>Eliminar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-professional-{{professional[0]}}">Eliminar</button>
+  </td>
+</tr>
+{% endfor %}
+{% endmacro %}
 
-{% endblock other_content  %}
+{% endblock content %}
