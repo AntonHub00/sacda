@@ -328,47 +328,55 @@ def admin_students_subscribe():
 
         #Check whether the fields are filled
         if '' in data.values():
-            return 'Los campos no pueden estar vacíos'
+            #return 'Los campos no pueden estar vacíos'
+            return render_template('admin/students_subscribe.html', sent = 0)
         elif not data['phone'].isdigit():
-            return 'El campo teléfono solo debe contener dígitos'
+            #return 'El campo teléfono solo debe contener dígitos'
+            return render_template('admin/students_subscribe.html', sent = 1)
         elif not data['enrollment'].isdigit():
-            return 'El campo matrícula solo debe contener dígitos'
+            #return 'El campo matrícula solo debe contener dígitos'
+            return render_template('admin/students_subscribe.html', sent = 2)
         else:
             try:
                 cur.execute(f''' SELECT NombreAlum FROM alumno WHERE MatAlum= '{data['enrollment']}' ''')
                 user = cur.fetchall()
             except:
-                return 'Hubo un problema al guadar la información en la base de datos'
-
+                #return 'Hubo un problema al guadar la información en la base de datos'
+                return render_template('admin/students_subscribe.html', sent = 3)
             if user:
-                return 'Ya existe un usuario registrado con esa matrícula'
+                #return 'Ya existe un usuario registrado con esa matrícula'
+                return render_template('admin/students_subscribe.html', sent = 4)
 
             try:
                 cur.execute(f''' SELECT CveCarrera FROM carreras WHERE DescripcionCarrera = '{data['career']}' ''')
                 data['career'] = cur.fetchall()[0][0]
             except:
-                return 'Hubo un problema al obtener la información de la base de datos'
+                #return 'Hubo un problema al obtener la información de la base de datos'
+                return render_template('admin/students_subscribe.html', sent = 5)
 
             data['password'] = generate_password_hash(data['password'], method = 'sha256')
 
             try:
                 cur.execute(f'''INSERT INTO alumno VALUES({data['enrollment']}, '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', {data['career']}, {data['semester']}, '{data['email']}', '{data['phone']}', '{data['gender']}', '{data['password']}', '{data['name_tutor']}', '{data['first_last_name_tutor']}', '{data['second_last_name_tutor']}', '{data['phone_tutor']}', '{data['email_tutor']}', 2)''')
             except:
-                return 'Hubo un problema al guadar la información en la base de datos'
+                #return 'Hubo un problema al obtener la información de la base de datos'
+                return render_template('admin/students_subscribe.html', sent = 5)
 
             mysql.connection.commit()
 
             #Implement message of success instead
-            return 'Alumno registrado con éxito'
+            return render_template('admin/students_subscribe.html', sent = 6)
+
 
     try:
         cur.execute(''' SELECT * FROM carreras''')
         r_career = cur.fetchall()
     except:
-        return 'Hubo un problema al obtener la información de la base de datos'
+        #Error con la base
+        return render_template('admin/students_subscribe.html', sent = 5)
 
 
-    return render_template('admin/students_subscribe.html', active = 'admin_students', r_career = r_career)
+    return render_template('admin/students_subscribe.html', active = 'admin_students', r_career = r_career, sent = 'unknown')
     #FIN
 @app.route('/administrador/estudiantes/modificar')
 @requires_access_level_and_session(roles['admin'])
