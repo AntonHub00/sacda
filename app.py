@@ -297,11 +297,69 @@ def admin_professionals_unsubscribe():
 
     return render_template('admin/professionals_unsubscribe.html', active = 'admin_professionals', r_professionals = r_professionals)
 
-@app.route('/administrador/profesionales/modificar')
+@app.route('/administrador/profesionales/modificar', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
 def admin_professionals_modify():
-    return render_template('admin/professionals_modify.html', active = 'admin_professionals')
-#INICIO
+    if request.method == 'POST':
+        professional_key = request.form['to_select']
+
+        return redirect(url_for('admin_professionals_modify_commit', professional_key = professional_key))
+
+    try:
+        cur.execute(''' SELECT RFC_Profesor, NombreProf, Primer_ApellidoP, Segundo_ApellidoP, puesto.DescPuesto, lugar.DescLugar, HorarioEntrada, HorarioSalida, CorreoP, TelProf FROM profesionista INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar INNER JOIN puesto ON profesionista.Puesto = puesto.CvePuesto WHERE Sistema = 1''')
+        r_professionals = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('admin/professionals_modify.html', active = 'admin_professionals', r_professionals = r_professionals)
+
+@app.route('/administrador/profesionales/modificar/editar', methods = ['GET', 'POST'])
+@requires_access_level_and_session(roles['admin'])
+def admin_professionals_modify_commit():
+    professional_key =  request.args.get('professional_key')
+    if request.method == 'POST':
+        data = {}
+
+        data['name'] = request.form['name']
+        data['first_last_name'] = request.form['first_last_name']
+        data['second_last_name'] = request.form['second_last_name']
+        data['rfc'] = request.form['rfc']
+        data['email'] = request.form['email']
+        data['phone'] = request.form['phone']
+        data['job'] = request.form['job']
+        data['entry_time'] = request.form['entry_time']
+        data['exit_time'] = request.form['exit_time']
+        data['place'] = request.form['place']
+
+        #Check whether the fields are filled
+        if '' in data.values():
+            return 'Los campos no puedes estar vacíos'
+        elif not data['phone'].isdigit():
+            return 'El campo teléfono debe contener unicamente números'
+        else:
+            try:
+                print(data.values())
+                cur.execute(f''' UPDATE profesionista SET NombreProf = '{data['name']}', Primer_ApellidoP = '{data['first_last_name']}', Segundo_ApellidoP = '{data['second_last_name']}', CorreoP = '{data['email']}', TelProf = '{data['phone']}', Puesto = {data['job']}, HorarioEntrada = '{data['entry_time']}', HorarioSalida = '{data['exit_time']}', Lugar = {data['place']} WHERE RFC_Profesor= '{data['rfc']}' ''')
+            except:
+                return 'Hubo un problema al actualizar la información de la base de datos'
+
+            mysql.connection.commit()
+            return redirect(url_for('admin_professionals_modify'))
+
+    try:
+        cur.execute(f''' SELECT * FROM lugar ''')
+        r_place = cur.fetchall()
+
+        cur.execute(f''' SELECT * FROM puesto''')
+        r_job = cur.fetchall()
+
+        cur.execute(f''' SELECT RFC_Profesor, CorreoP, TelProf, NombreProf, Primer_ApellidoP, Segundo_ApellidoP, puesto.DescPuesto, HorarioEntrada, HorarioSalida, lugar.DescLugar from profesionista INNER JOIN puesto ON profesionista.Puesto = puesto.CvePuesto INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar WHERE RFC_Profesor = '{professional_key}' AND Sistema = 1''')
+        professional = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('admin/professionals_modify_commit.html', active = 'admin_professionals', r_place = r_place, r_job = r_job, professional = professional)
+
 @app.route('/administrador/estudiantes/alta', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
 def admin_students_subscribe():

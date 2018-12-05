@@ -1,0 +1,134 @@
+{% extends 'admin/navbar.html' %}
+
+{% macro render_hours(got_hour) %}
+{% for hour in range(7, 21) %}
+  <option selected="selected">{{ '{:02d}:00'.format(hour) }}</option>
+{% endfor %}
+{% endmacro %}
+
+
+{% block title %}
+Editar profesionista
+{% endblock title %}
+
+{% block content %}
+{% if sent == 1 %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  Los campos no pueden estar vacíos
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{%endif%}
+{% if sent == 2 %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  El campo teléfono solo debe contener dígitos
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif%}
+{% if sent == 3 %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  Hubo un problema al guadar la información en la base de datos
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif%}
+{% if sent == 4 %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  Ya existe un usuario registrado con ese RFC
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif%}
+{% if sent == 5 %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  Hubo un problema al obtener la información de la base de datos
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif%}
+{% if sent == 6 %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  El profesionista fue registrado con Éxito
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif%}
+
+<form method="POST" action="{{ url_for('admin_professionals_modify_commit') }}">
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="rfc">RFC</label>
+      <input type="text" class="form-control" id="rfc" name="rfc" placeholder="RFC" maxlength="15" readonly="readonly" value="{{ professional[0][0] }}">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="email">Correo electrónico</label>
+      <input type="email" class="form-control" id="email" name="email" placeholder="Correo electrónico" maxlength="35" value="{{ professional[0][1] }}">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="phone">Teléfono</label>
+      <input type="text" class="form-control" id="phone" name="phone" placeholder="Teléfono" maxlength="14" value="{{ professional[0][2] }}">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="name">Nombre</label>
+      <input type="text" class="form-control" id="name" name="name" placeholder="Nombre" maxlength="35" value="{{ professional[0][3] }}">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="first_last_name">Apellido Paterno</label>
+      <input type="text" class="form-control" id="first_last_name" name="first_last_name" placeholder="Apellido Paterno" maxlength="25" value="{{ professional[0][4] }}">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="second_last_name">Apellido Materno</label>
+      <input type="text" class="form-control" id="second_last_name" name="second_last_name" placeholder="Apellido Materno" maxlength="25" value="{{ professional[0][5] }}">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="job">Puesto</label>
+      <select id="job" name="job" class="form-control">
+        {% for job in r_job %}
+          {% if job ==  professional[0][6] %}
+            <option selected="selected" value="{{ job[0] }}">{{ job[1] }}</option>
+          {% endif %}
+            <option value="{{ job[0] }}">{{ job[1] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group col-md-4">
+      <label for="entry_time">Hora de entrada</label>
+      <select id="entry_time" name="entry_time" class="form-control">
+        {{ render_hours(professional[0][7]) }}
+      </select>
+    </div>
+    <div class="form-group col-md-4">
+      <label for="exit_time">Hora de entrada</label>
+      <select id="exit_time" name="exit_time" class="form-control">
+        {{ render_hours(professional[0][8]) }}
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-12">
+      <label for="place">Lugar</label>
+      <select id="place" name="place" class="form-control">
+        {% for place in r_place %}
+          {% if place == professional[0][9] %}
+            <option  selected="selected" value="{{ place[0] }}">{{ place[1] }}</option>
+          {% endif %}
+            <option value="{{ place[0] }}">{{ place[1] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary btn-block">Actualizar</button>
+</form>
+{% endblock content %}
+

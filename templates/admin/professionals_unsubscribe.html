@@ -1,5 +1,9 @@
 {% extends 'admin/navbar.html' %}
 
+{% block title %}
+Dar de baja profesionistas
+{% endblock title %}
+
 {% macro render_professionals() %}
 {% for professional in r_professionals %}
 <tr>
@@ -40,10 +44,6 @@
 </tr>
 {% endfor %}
 {% endmacro %}
-
-{% block title %}
-Dar de baja profesionistas
-{% endblock title %}
 
 {% block other_content  %}
 <div class="table-responsive">
