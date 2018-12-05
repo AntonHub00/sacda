@@ -260,7 +260,7 @@ def admin_professionals_subscribe():
             mysql.connection.commit()
 
             #Implement message of success instead
-            return render_template('admin/professionals_subscribe.htlm', sent = 6)
+            return render_template('admin/professionals_subscribe.html', sent = 6)
 
     try:
         cur.execute(''' SELECT * FROM lugar''')
@@ -351,7 +351,7 @@ def admin_students_subscribe():
             data['password'] = generate_password_hash(data['password'], method = 'sha256')
 
             try:
-                cur.execute(f'''INSERT INTO alumno VALUES({data['enrollment']}, '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', {data['career']}, {data['semester']}, '{data['email']}', '{data['phone']}', '{data['gender']}', '{data['password']}', '{data['name_tutor']}', '{data['first_last_name_tutor']}', '{data['second_last_name_tutor']}', '{data['phone_tutor']}', '{data['email_tutor']}', 2,1)''')
+                cur.execute(f'''INSERT INTO alumno VALUES({data['enrollment']}, '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', {data['career']}, {data['semester']}, '{data['email']}', '{data['phone']}', '{data['gender']}', '{data['password']}', '{data['name_tutor']}', '{data['first_last_name_tutor']}', '{data['second_last_name_tutor']}', '{data['phone_tutor']}', '{data['email_tutor']}', 2, 1)''')
             except:
                 return 'Hubo un problema al guadar la información en la base de datos'
 
