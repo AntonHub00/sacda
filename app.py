@@ -151,9 +151,6 @@ def change_password(token):
     return render_template('main/change_password.html', token = token)
 
 @app.route('/')
-def index():
-    return render_template('main/index.html')
-
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     if request.method == 'POST':
