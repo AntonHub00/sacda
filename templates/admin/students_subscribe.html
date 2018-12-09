@@ -16,7 +16,7 @@ Registrar alumnos
 </div>
 {% endif%}
 
-{% if sent == 1 %}oooo
+{% if sent == 1 %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
   El campo teléfono solo debe contener dígitos.
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -152,7 +152,7 @@ Registrar alumnos
       <label for="career">Carreras</label>
       <select id="career" name="career" class="form-control">
         {% for career in r_career %}
-        <option selected>{{ career[0] }}</option>
+        <option selected>{{ career[1] }}</option>
         {% endfor %}
       </select>
     </div>

@@ -24,12 +24,12 @@ app.config['MAIL_USE_SSL'] = True
 app.config['MYSQL_HOST'] = '127.0.0.1'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'sacda_5'
+app.config['MYSQL_DB'] = 'sacda'
 
 mysql = MySQL(app)
 mail = Mail(app)
 cur = None #This global variable (cursor) makes it posible to open/close database connection with before_request/after_request decorators
-roles = {'professional' : 1, 'student' : 2, 'admin' : 3}
+roles = { 'student' : 1, 'professional' : 2, 'admin' : 3}
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
 def requires_access_level_and_session(access_level):
@@ -40,13 +40,13 @@ def requires_access_level_and_session(access_level):
                 return redirect(url_for('login'))
 
             try:
-                cur.execute(f''' SELECT Rol FROM profesionista WHERE RFC_Profesor = '{session['user']}' ''')
+                cur.execute(f''' SELECT rol FROM profesionista WHERE id = '{session['user']}' ''')
                 professional = cur.fetchall()
 
-                cur.execute(f''' SELECT Rol FROM administrador WHERE RFC_Prof = '{session['user']}' ''')
+                cur.execute(f''' SELECT rol FROM administrador WHERE id = '{session['user']}' ''')
                 admin = cur.fetchall()
 
-                cur.execute(f''' SELECT Rol FROM alumno WHERE MatAlum = '{session['user']}' ''')
+                cur.execute(f''' SELECT rol FROM estudiante WHERE id = '{session['user']}' ''')
                 student = cur.fetchall()
 
                 if professional:
@@ -86,33 +86,33 @@ def reset_password():
         user = request.form['user']
 
         try:
-            cur.execute(f''' SELECT CorreoP, NombreProf FROM profesionista WHERE RFC_Profesor = '{user}' ''')
+            cur.execute(f''' SELECT correo, nombre FROM profesionista WHERE id = '{user}' ''')
             professional = cur.fetchall()
 
-            cur.execute(f''' SELECT CorreoAdmin, NombreAdm FROM administrador WHERE RFC_Prof = '{user}' ''')
+            cur.execute(f''' SELECT correo, nombre FROM administrador WHERE id = '{user}' ''')
             admin = cur.fetchall()
 
-            cur.execute(f''' SELECT CorreoAlum, NombreAlum FROM alumno WHERE MatAlum = '{user}' ''')
+            cur.execute(f''' SELECT correo, nombre FROM estudiante WHERE id = '{user}' ''')
             student = cur.fetchall()
 
             if professional:
                 user_mail = professional[0][0]
                 user_name = professional[0][1]
-                user_identifier_field = 'RFC_Profesor'
+                user_identifier_field = 'id'
                 user_role_field = 'profesionista'
-                user_password_field = 'ContraProf'
+                user_password_field = 'contraseña'
             elif admin:
                 user_mail = admin[0][0]
                 user_name = admin[0][1]
-                user_identifier_field = 'RFC_Prof'
+                user_identifier_field = 'id'
                 user_role_field = 'administrador'
-                user_password_field = 'ContraAdmin'
+                user_password_field = 'contraseña'
             elif student:
                 user_mail = student[0][0]
                 user_name = student[0][1]
-                user_identifier_field = 'MatAlum'
-                user_role_field = 'alumno'
-                user_password_field = 'ContraAlum'
+                user_identifier_field = 'id'
+                user_role_field = 'estudiante'
+                user_password_field = 'contraseña'
             else:
                 return render_template('main/reset_password.html', sent = False)
         except:
@@ -159,13 +159,13 @@ def login():
         redirect_user = None
 
         try:
-            cur.execute(f''' SELECT ContraProf, Sistema FROM profesionista WHERE RFC_Profesor = '{user}' ''')
+            cur.execute(f''' SELECT contraseña, sistema FROM profesionista WHERE id = '{user}' ''')
             professional = cur.fetchall()
 
-            cur.execute(f''' SELECT ContraAdmin FROM administrador WHERE RFC_Prof = '{user}' ''')
+            cur.execute(f''' SELECT contraseña FROM administrador WHERE id = '{user}' ''')
             admin = cur.fetchall()
 
-            cur.execute(f''' SELECT ContraAlum FROM alumno WHERE MatAlum = '{user}' ''')
+            cur.execute(f''' SELECT contraseña FROM estudiante WHERE id = '{user}' ''')
             student = cur.fetchall()
 
             if professional:
@@ -231,7 +231,7 @@ def admin_professionals_subscribe():
             return render_template('admin/professionals_subscribe.html', sent = 2)
         else:
             try:
-                cur.execute(f''' SELECT NombreProf FROM profesionista WHERE RFC_Profesor= '{data['rfc']}' ''')
+                cur.execute(f''' SELECT nombre FROM profesionista WHERE id= '{data['rfc']}' ''')
                 user = cur.fetchall()
             except:
                 return render_template('admin/professionals_subscribe.html', sent = 3)
@@ -239,10 +239,10 @@ def admin_professionals_subscribe():
                 return render_template('admin/professionals_subscribe.html', sent = 4)
 
             try:
-                cur.execute(f''' SELECT CvePuesto FROM puesto WHERE DescPuesto = '{data['job']}' ''')
+                cur.execute(f''' SELECT id FROM puesto WHERE descripcion = '{data['job']}' ''')
                 data['job'] = cur.fetchall()[0][0]
 
-                cur.execute(f''' SELECT CveLugar FROM lugar WHERE DescLugar = '{data['place']}' ''')
+                cur.execute(f''' SELECT id FROM lugar WHERE descripcion = '{data['place']}' ''')
                 data['place'] = cur.fetchall()[0][0]
             except:
                 return render_template('admin/professionals_subscribe.html', sent = 5)
@@ -250,7 +250,17 @@ def admin_professionals_subscribe():
             data['password'] = generate_password_hash(data['password'], method = 'sha256')
 
             try:
-                cur.execute(f'''INSERT INTO profesionista VALUES('{data['rfc']}', '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', '{data['email']}', '{data['phone']}', '{data['rfc']}', {data['job']}, '{data['password']}', '{data['entry_time']}', '{data['exit_time']}', {data['place']}, 1, 1)''')
+                cur.execute(f'''
+                            insert into profesionista (id, nombre, primer_apellido, segundo_apellido, correo, telefono, puesto, contraseña, lugar)
+                            values
+                            ('{data['rfc']}', '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', '{data['email']}', '{data['phone']}', {data['job']}, '{data['password']}', {data['place']})
+                             ''')
+
+                cur.execute(f'''
+                            INSERT INTO horario
+                            VALUES
+                            ('{data['rfc']}', '{data['entry_time']}', '{data['exit_time']}', '{data['entry_time']}', '{data['exit_time']}', '{data['entry_time']}', '{data['exit_time']}', '{data['entry_time']}', '{data['exit_time']}', '{data['entry_time']}', '{data['exit_time']}')
+                             ''')
             except:
                 return render_template('admin/professionals_subscribe.html', sent = 3)
 
@@ -278,7 +288,7 @@ def admin_professionals_unsubscribe():
         professional_key = request.form['to_delete']
 
         try:
-            cur.execute(f''' UPDATE profesionista SET Sistema = 0 WHERE RFC_Profesor = '{professional_key}' ''')
+            cur.execute(f''' UPDATE profesionista SET sistema = 0 WHERE id = '{professional_key}' ''')
         except:
             return 'Hubo un problema al actualizar la información en la base de datos'
 
@@ -287,7 +297,9 @@ def admin_professionals_unsubscribe():
         return redirect(url_for('admin_professionals_unsubscribe'))
 
     try:
-        cur.execute(''' SELECT RFC_Profesor, NombreProf, Primer_ApellidoP, Segundo_ApellidoP, puesto.DescPuesto, lugar.DescLugar, HorarioEntrada, HorarioSalida, CorreoP, TelProf FROM profesionista INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar INNER JOIN puesto ON profesionista.Puesto = puesto.CvePuesto WHERE Sistema = 1''')
+        cur.execute('''
+                    SELECT profesionista.id, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion FROM profesionista INNER JOIN puesto on profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id WHERE sistema = 1
+                    ''')
         r_professionals = cur.fetchall()
     except:
         return 'Hubo un problema al obtener la información de la base de datos'
@@ -392,7 +404,7 @@ def admin_students_subscribe():
             return render_template('admin/students_subscribe.html', sent = 2)
         else:
             try:
-                cur.execute(f''' SELECT NombreAlum FROM alumno WHERE MatAlum= '{data['enrollment']}' ''')
+                cur.execute(f''' SELECT nombre FROM estudiante WHERE id = '{data['enrollment']}' ''')
                 user = cur.fetchall()
             except:
                 #return 'Hubo un problema al guadar la información en la base de datos'
@@ -402,7 +414,7 @@ def admin_students_subscribe():
                 return render_template('admin/students_subscribe.html', sent = 4)
 
             try:
-                cur.execute(f''' SELECT CveCarrera FROM carreras WHERE DescripcionCarrera = '{data['career']}' ''')
+                cur.execute(f''' SELECT id FROM carrera WHERE descripcion = '{data['career']}' ''')
                 data['career'] = cur.fetchall()[0][0]
             except:
                 #return 'Hubo un problema al obtener la información de la base de datos'
@@ -411,7 +423,9 @@ def admin_students_subscribe():
             data['password'] = generate_password_hash(data['password'], method = 'sha256')
 
             try:
-                cur.execute(f'''INSERT INTO alumno VALUES({data['enrollment']}, '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', {data['career']}, {data['semester']}, '{data['email']}', '{data['phone']}', '{data['gender']}', '{data['password']}', '{data['name_tutor']}', '{data['first_last_name_tutor']}', '{data['second_last_name_tutor']}', '{data['phone_tutor']}', '{data['email_tutor']}', 2, 1)''')
+                cur.execute(f'''
+                            INSERT INTO estudiante (id, nombre, primer_apellido, segundo_apellido, carrera, semestre, correo, telefono, genero, contraseña, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, telefono_tutor, correo_tutor) VALUES('{data['enrollment']}', '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', {data['career']}, {data['semester']}, '{data['email']}', '{data['phone']}', '{data['gender']}', '{data['password']}', '{data['name_tutor']}', '{data['first_last_name_tutor']}', '{data['second_last_name_tutor']}', '{data['phone_tutor']}', '{data['email_tutor']}')
+                            ''')
             except:
                 #return 'Hubo un problema al obtener la información de la base de datos'
                 return render_template('admin/students_subscribe.html', sent = 5)
@@ -423,7 +437,7 @@ def admin_students_subscribe():
 
 
     try:
-        cur.execute(''' SELECT * FROM carreras''')
+        cur.execute(''' SELECT * FROM carrera''')
         r_career = cur.fetchall()
     except:
         #Error con la base
@@ -444,7 +458,7 @@ def admin_students_unsubscribe():
         student_key = request.form['to_delete']
 
         try:
-            cur.execute(f''' UPDATE alumno SET Sistema = 0 WHERE MatAlum = '{student_key}' ''')
+            cur.execute(f''' UPDATE estudiante SET sistema = 0 WHERE id = '{student_key}' ''')
         except:
             return 'Hubo un problema al actualizar la información en la base de datos'
 
@@ -453,7 +467,9 @@ def admin_students_unsubscribe():
         return redirect(url_for('admin_students_unsubscribe'))
 
     try:
-        cur.execute(''' SELECT MatAlum, NombreAlum, Primer_ApellidoA, Segundo_ApellidoA, DescripcionCarrera, Semestre, CorreoAlum, TelAlum FROM alumno INNER JOIN carreras ON alumno.Carrera = carreras.CveCarrera WHERE Sistema = 1 ''')
+        cur.execute('''
+                    SELECT estudiante.id, nombre, primer_apellido, segundo_apellido, carrera.descripcion, semestre FROM estudiante INNER JOIN carrera on estudiante.carrera = carrera.id WHERE sistema = 1;
+                    ''')
         r_students = cur.fetchall()
     except:
         return 'Hubo un problema al obtener la información de la base de datos'
@@ -486,7 +502,7 @@ def admin_statistics_canalization():
 @requires_access_level_and_session(roles['professional'])
 def professional_home():
     try:
-        cur.execute(f'''SELECT NombreProf FROM profesionista WHERE RFC_Profesor = '{session['user']}' ''')
+        cur.execute(f'''SELECT nombre FROM profesionista WHERE id = '{session['user']}' ''')
         professional_name = cur.fetchall()[0][0]
     except:
         return 'Hubo un problema al obtener la información de la base de datos'
@@ -502,7 +518,9 @@ def professional_schedule():
 @requires_access_level_and_session(roles['professional'])
 def professional_data():
     try:
-        cur.execute(f'''SELECT NombreProf, Primer_ApellidoP , Segundo_ApellidoP, CorreoP, TelProf, DescPuesto, HorarioEntrada, HorarioSalida, DescLugar FROM profesionista INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar INNER JOIN puesto ON profesionista.Puesto = puesto.CvePuesto WHERE RFC_Profesor = '{session['user']}' ''')
+        cur.execute(f'''
+                    SELECT nombre, primer_apellido, segundo_apellido, correo, telefono, puesto.descripcion, horario.lunes_entrada, horario.lunes_salida, lugar.descripcion FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN horario ON profesionista.id = horario.id INNER JOIN lugar ON profesionista.lugar = lugar.id WHERE profesionista.id = '{session['user']}'
+                    ''')
         professional_data = cur.fetchall()
     except:
         return 'Hubo un problema al guadar la información en la base de datos'
@@ -515,7 +533,7 @@ def professional_data():
 @requires_access_level_and_session(roles['student'])
 def student_home():
     try:
-        cur.execute(f'''SELECT NombreAlum FROM alumno WHERE MatAlum = '{session['user']}' ''')
+        cur.execute(f'''SELECT nombre FROM estudiante WHERE id = '{session['user']}' ''')
         student_name = cur.fetchall()[0][0]
     except:
         return 'Hubo un problema al obtener la información de la base de datos'
@@ -531,7 +549,9 @@ def student_schedule():
 @requires_access_level_and_session(roles['student'])
 def student_data():
     try:
-        cur.execute(f'''SELECT NombreAlum, Primer_ApellidoA, Segundo_ApellidoA, DescripcionCarrera, Semestre, CorreoAlum, TelAlum, SexoA, NombreTutor, Primer_ApellidoT, Segundo_ApellidoT, TelTutor, CorreoTutor FROM alumno INNER JOIN carreras ON alumno.Carrera = carreras.CveCarrera WHERE MatAlum = {session['user']} ''')
+        cur.execute(f'''
+                    SELECT nombre, primer_apellido, segundo_apellido, carrera.descripcion, semestre, correo, telefono, genero, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, telefono_tutor, correo_tutor FROM estudiante INNER JOIN carrera on estudiante.carrera = carrera.id WHERE estudiante.id = 'session['user']'
+                    ''')
         student_data = cur.fetchall()
     except:
         return 'Hubo un problema al guadar la información en la base de datos'
