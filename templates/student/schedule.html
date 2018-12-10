@@ -1,5 +1,19 @@
 {% extends 'student/navbar.html' %}
 
 {% block title %}
-Agenda
+Agendar
 {% endblock title %}
+
+{% block content %}
+<form method="POST" action="{{ url_for('admin_professionals_subscribe') }}">
+  <div class="form-row">
+    <div class="form-group col">
+      <label for="rfc">Fecha</label>
+      <div id="date-picker" class="input-group date">
+        <input type="text" class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+      </div>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary btn-block">Blah blah</button>
+</form>
+{% endblock content %}

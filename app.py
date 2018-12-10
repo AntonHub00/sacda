@@ -540,7 +540,7 @@ def student_home():
 
     return render_template('student/home.html', active = 'student_home', student_name = student_name)
 
-@app.route('/alumno/agenda')
+@app.route('/alumno/agendar')
 @requires_access_level_and_session(roles['student'])
 def student_schedule():
     return render_template('student/schedule.html', active = 'student_schedule')
