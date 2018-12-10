@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, request, redirect, url_for
+from flask import Flask, render_template, session, request, redirect, url_for, jsonify
 from flask_mysqldb import MySQL
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
@@ -154,19 +154,23 @@ def change_password(token):
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = request.form['user']
-        password = request.form['password']
+        data = {}
+        data['user'] = request.form['user']
+        data['password'] = request.form['password']
         redirect_user = None
         in_system = False
 
+        if '' in data.values():
+            return jsonify({'error':'Los campos no pueden estar vacíos'})
+
         try:
-            cur.execute(f''' SELECT contraseña, sistema FROM profesionista WHERE id = '{user}' ''')
+            cur.execute(f''' SELECT contraseña, sistema FROM profesionista WHERE id = '{data['user']}' ''')
             professional = cur.fetchall()
 
-            cur.execute(f''' SELECT contraseña FROM administrador WHERE id = '{user}' ''')
+            cur.execute(f''' SELECT contraseña FROM administrador WHERE id = '{data['user']}' ''')
             admin = cur.fetchall()
 
-            cur.execute(f''' SELECT contraseña, sistema FROM estudiante WHERE id = '{user}' ''')
+            cur.execute(f''' SELECT contraseña, sistema FROM estudiante WHERE id = '{data['user']}' ''')
             student = cur.fetchall()
 
             if professional:
@@ -184,16 +188,17 @@ def login():
                 if student[0][1] == 1:
                     in_system = True
             else:
-                return redirect(url_for('login'))
+                return jsonify({'error':'La contraseña o el usuario son incorrectos'})
         except:
-            return 'Hubo un problema al obtener la información de la base de datos'
+            return jsonify({'error':'Hubo un problema al obtener la información de la base de datos'})
 
         #Checking if the password given is correct and is a registered user
         #TODO: add "in system" flags to student and admin
-        if check_password_hash(r_password, password) and in_system:
-            session['user'] = user
+        if check_password_hash(r_password, data['password']) and in_system:
+            session['user'] = data['user']
+            return jsonify({'new_url' : url_for(redirect_user) })
 
-        return redirect(url_for(redirect_user))
+        return jsonify({'error':'La contraseña o el usuario son incorrectos'})
 
     return render_template('main/login.html')
 
