@@ -31,7 +31,7 @@ Editar alumno
 {% endif%}
 {% if sent == 4 %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
-  Hubo un problema al actualizar la información de la base de datos 
+  Hubo un problema al actualizar la información de la base de datos
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
@@ -60,8 +60,16 @@ Editar alumno
       <label for="rfc">Matrícula</label>
       <input type="text" class="form-control" id="enrollment" name="enrollment" placeholder="RFC" maxlength="15" readonly="readonly" value="{{ student[0][0] }}">
     </div>
-   </div>
-   <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="email">Correo electrónico</label>
+      <input type="email" class="form-control" id="email" name="email" placeholder="Correo electrónico" maxlength="35" value="{{ student[0][6] }}">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="phone">Teléfono</label>
+      <input type="text" class="form-control" id="phone" name="phone" placeholder="Teléfono" maxlength="14" value="{{ student[0][7] }}">
+    </div>
+  </div>
+  <div class="form-row">
     <div class="form-group col-md-4">
       <label for="name">Nombre</label>
       <input type="text" class="form-control" id="name" name="name" placeholder="Nombre" maxlength="35" value="{{ student[0][1] }}">
@@ -76,16 +84,7 @@ Editar alumno
     </div>
   </div>
   <div class="form-row">
-    <div class="form-group col-md-4">
-      <label for="email">Correo electrónico</label>
-      <input type="email" class="form-control" id="email" name="email" placeholder="Correo electrónico" maxlength="35" value="{{ student[0][6] }}">
-    </div>
-    <div class="form-group col-md-4">
-      <label for="phone">Teléfono</label>
-      <input type="text" class="form-control" id="phone" name="phone" placeholder="Teléfono" maxlength="14" value="{{ student[0][7] }}">
-    </div>
   </div>
-
   <div class="form-row">
   	<div class="form-group col-md-4">
       <label for="career">Carreras</label>
@@ -101,11 +100,21 @@ Editar alumno
           {% else %}
             <option value="{{ career[0]}}">{{ career[1] }}</option>
             {% endif %}
-
         {% endfor %}
       </select>
     </div>
-
+  	<div class="form-group col-md-4">
+      <label for="gender">Género</label>
+      <select id="gender" name="gender" class="form-control">
+        {% if student[0][13] == 'Masculino' %}
+          <option selected="selected">Masculino</option>
+          <option>Femenino</option>
+        {% else %}
+          <option selected="selected">Femenino</option>
+          <option>Masculino</option>
+        {% endif %}
+      </select>
+    </div>
     <div class="form-group col-md-4">
       <label for="semester">Semestre</label>
       <select class="form-control" id="semester" name="semester">
@@ -121,7 +130,6 @@ Editar alumno
         {% endfor %}
       </select>
     </div>
-   
   </div>
   <div class="form-row">
     <div class="form-group col-md-4">
@@ -136,20 +144,16 @@ Editar alumno
       <label for="second_last_name_tutor">Segundo Apellido Del Tutor</label>
       <input type="text" class="form-control" id="second_last_name_tutor" name="second_last_name_tutor" placeholder="Segundo Apellido del Tutor" maxlength="25" value="{{student[0][10]}}">
     </div>
-
   </div>
   <div class="form-row">
-    <div class="form-group col-md-4">
+    <div class="form-group col-md-6">
       <label for="phone_tutor">Teléfono Del Tutor</label>
       <input type="text" class="form-control" id="phone_tutor" name="phone_tutor" placeholder="Teléfono del Tutor" maxlength="14" value="{{student[0][11]}}">
     </div>
-    <div class="form-group col-md-4">
+    <div class="form-group col-md-6">
       <label for="email_tutor">Correo Del Tutor</label>
       <input type="email" class="form-control" id="email_tutor" name="email_tutor" placeholder="Correo del Tutor" maxlength="30" value="{{student[0][12]}}">
     </div>
-
   <button type="submit" class="btn btn-primary btn-block">Actualizar</button>
 </form>
 {% endblock content %}
-
-
