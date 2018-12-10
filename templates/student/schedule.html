@@ -1,46 +1,5 @@
 {% extends 'student/navbar.html' %}
 
-<<<<<<< HEAD
-{% from 'macros/_hours.html' import render_hours %}
-
-{% block other_content  %}
-<div class ="">
-	Paso2.- Selecciona Fecha y Hora
-</div>
-<div class="students_register_date">
-
-	<form method="POST" action="{{ url_for('student_schedule')}}">
-		<div class="form-row">
-			<div class="form-group col-md-4">
-				<label for="Date">Fecha</label>
-				    <meta charset="utf-8">
-    				<meta name="viewport" content="width=device-width, initial-scale=1">
-    				<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    				<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    				<script src="https://unpkg.com/gijgo@1.9.11/js/gijgo.min.js" type="text/javascript"></script>
-    				<link href="https://unpkg.com/gijgo@1.9.11/css/gijgo.min.css" rel="stylesheet" type="text/css" />
-					<body>
-					    <input id="datepicker" width="276" />
-					    <script>
-					        $('#datepicker').datepicker({
-					            uiLibrary: 'bootstrap4'
-					        });
-					    </script>
-					</body>
-			</div>
-			<div class="form-group col-md-4">
-				<label for="entry_time">Hora</label>
-				<select id="entry_time" name="entry_time" class="form-control">
-        			{{ render_hours() }}
-      			</select>
-    		</div>
-		</div>
-		<button type="button" class="btn btn-secondary btn-lg btn-block">Agendar Cita</button>
-	</form>
-
-</div>
-{% endblock other_content %}
-=======
 {% block title %}
 Agendar
 {% endblock title %}
@@ -58,4 +17,3 @@ Agendar
   <button type="submit" class="btn btn-primary btn-block">Blah blah</button>
 </form>
 {% endblock content %}
->>>>>>> 85a013f919c426d16729d747d8a44c19f4b42e87
