@@ -1,5 +1,6 @@
 {% extends 'student/navbar.html' %}
 
+<<<<<<< HEAD
 {% from 'macros/_hours.html' import render_hours %}
 
 {% block other_content  %}
@@ -39,3 +40,22 @@
 
 </div>
 {% endblock other_content %}
+=======
+{% block title %}
+Agendar
+{% endblock title %}
+
+{% block content %}
+<form method="POST" action="{{ url_for('admin_professionals_subscribe') }}">
+  <div class="form-row">
+    <div class="form-group col">
+      <label for="rfc">Fecha</label>
+      <div id="date-picker" class="input-group date">
+        <input type="text" class="form-control"><span class="input-group-addon"><i class="glyphicon glyphicon-th"></i></span>
+      </div>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary btn-block">Blah blah</button>
+</form>
+{% endblock content %}
+>>>>>>> 85a013f919c426d16729d747d8a44c19f4b42e87

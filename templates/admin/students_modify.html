@@ -45,6 +45,14 @@ Modificar estudiantes
 
 
 {% block other_content  %}
+{% if sent == 1 %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  Hubo un problema al guadar la información en la base de datos
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif%}
 <div class="table-responsive">
   <table class="table table-striped">
     <thead class="thead-dark">

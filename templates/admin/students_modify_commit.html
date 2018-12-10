@@ -5,7 +5,7 @@ Editar alumno
 {% endblock title %}
 
 {% block content %}
-<!--{% if sent == 1 %}
+{% if sent == 1 %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
   Los campos no pueden estar vacíos
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -31,7 +31,7 @@ Editar alumno
 {% endif%}
 {% if sent == 4 %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert">
-  Ya existe un usuario registrado con ese RFC
+  Hubo un problema al actualizar la información de la base de datos 
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
@@ -52,13 +52,13 @@ Editar alumno
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
-{% endif%}-->
+{% endif%}
 
 <form method="POST" action="{{ url_for('admin_students_modify_commit') }}">
   <div class="form-row">
     <div class="form-group col-md-4">
       <label for="rfc">Matrícula</label>
-      <input type="text" class="form-control" id="rfc" name="rfc" placeholder="RFC" maxlength="15" readonly="readonly" value="{{ student[0][0] }}">
+      <input type="text" class="form-control" id="enrollment" name="enrollment" placeholder="RFC" maxlength="15" readonly="readonly" value="{{ student[0][0] }}">
     </div>
    </div>
    <div class="form-row">
@@ -92,21 +92,32 @@ Editar alumno
       <select id="career" name="career" class="form-control">
         {% for career in r_career %}
         	{% if career == student[0][4] %}
-            	<option  selected="selected" value="{{ career[0] }}">{{ career[1] }}</option>
+            <option  selected="selected" value="{{ career[0] }}">{{ career[1] }}</option>
          	{% endif %}
             <option value="{{ career[0]}}">{{ career[1] }}</option>
+
+          {% if career[1] == student[0][4]%}
+            <option  selected="selected" value="{{ career[0] }}">{{ career[1] }}</option>
+          {% else %}
+            <option value="{{ career[0]}}">{{ career[1] }}</option>
+            {% endif %}
+
         {% endfor %}
-        print ('###')
       </select>
     </div>
+
     <div class="form-group col-md-4">
       <label for="semester">Semestre</label>
       <select class="form-control" id="semester" name="semester">
         {% for semester in range(14) %}
-        {% if semester ==  student[0][5] %}
-            <option selected="selected" value="{{ student[0][5 ] }}">{{ student[0][5] }}</option>
+          {% if semester ==  student[0][5] %}
+            <option selected="selected" value="{{ semester }}">{{ semester }}</option>
           {% endif %}
-            <option value="{{ student[0][5]}}">{{ student[0][5] }}</option>
+          {%if semester[1] == student[0][5] %}
+            <option selected="selected" value="{{ semester }}">{{ semester }}</option>
+          {% else %}
+            <option value="{{ semester }}">{{ semester }}</option>
+          {% endif%}
         {% endfor %}
       </select>
     </div>
