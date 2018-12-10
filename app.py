@@ -24,7 +24,7 @@ app.config['MAIL_USE_SSL'] = True
 app.config['MYSQL_HOST'] = '127.0.0.1'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'sacda'
+app.config['MYSQL_DB'] = 'sacda_testing'
 
 mysql = MySQL(app)
 mail = Mail(app)
@@ -369,7 +369,7 @@ def admin_professionals_modify_commit():
         r_schedule = cur.fetchall()
 
         cur.execute(f'''
-                    SELECT profesionista.id, correo, telefono, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion from profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id WHERE profesionista.id = '{professional_key}' AND sistema = 1
+                    SELECT profesionista.id, correo, telefono, nombre, primer_apellido, segundo_apellido, puesto.descripcion, horario.lunes_entrada, horario.lunes_salida, lugar.descripcion from profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON horario.id = profesionista.id WHERE profesionista.id = '{professional_key}' AND sistema = 1
                 ''')
         professional = cur.fetchall()
     except:
@@ -454,10 +454,70 @@ def admin_students_subscribe():
 
     return render_template('admin/students_subscribe.html', active = 'admin_students', r_career = r_career, sent = 'unknown')
     #FIN
-@app.route('/administrador/estudiantes/modificar')
+
+@app.route('/administrador/estudiantes/modificar',  methods = ['GET','POST'])
 @requires_access_level_and_session(roles['admin'])
 def admin_students_modify():
-    return render_template('admin/students_modify.html', active = 'admin_students')
+    if request.method == 'POST':
+        student_key = request.form['to_select']
+        return redirect(url_for('admin_students_modify_commit', student_key = student_key))
+
+    try:
+        cur.execute(f''' SELECT estudiante.id, nombre, primer_apellido, segundo_apellido, carrera.descripcion, semestre, correo, telefono FROM estudiante INNER JOIN  carrera ON carrera.id = estudiante.carrera WHERE Sistema = 1''')
+        r_students = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('admin/students_modify.html', active = 'admin_students', r_students = r_students)
+
+
+@app.route('/administrador/estudiantes/modificar/editardatos', methods = ['GET', 'POST'])
+@requires_access_level_and_session(roles['admin'])
+def admin_students_modify_commit():
+    student_key =  request.args.get('student_key')
+    if request.method == 'POST':
+        data = {}
+
+        data['name'] = request.form['name']
+        data['first_last_name'] = request.form['first_last_name']
+        data['second_last_name'] = request.form['second_last_name']
+        data['enrollment'] = request.form['enrollment']
+        data['email'] = request.form['email']
+        data['phone'] = request.form['phone']
+        data['career'] = request.form['career']
+        data['semester'] = request.form['semester']
+        #Tutor
+        data['name_tutor'] = request.form['name_tutor']
+        data['first_last_name_tutor'] = request.form['first_last_name_tutor']
+        data['second_last_name_tutor'] = request.form['second_last_name_tutor']
+        data['phone_tutor'] = request.form['phone_tutor']
+        data['email_tutor'] = request.form['email_tutor']
+
+        #Check whether the fields are filled
+        if '' in data.values():
+            return 'Los campos no puedes estar vacíos'
+        elif not data['phone'].isdigit():
+            return 'El campo teléfono debe contener unicamente números'
+        else:
+            try:
+                cur.execute(f''' UPDATE estudiante SET nombre = '{data['name']}', primer_apellido = '{data['first_last_name']}', segundo_apellido = '{data['second_last_name']}', correo = '{data['email']}', telefono = '{data['phone']}', carrera = {data['career']}, semestre = {data['semester']}, nombre_tutor = '{data['name_tutor']}', primer_apellido_tutor = '{data['first_last_name_tutor']}', segundo_apellido_tutor = '{data['second_last_name_tutor']}', telefono_tutor = '{data['phone_tutor']}', correo_tutor = '{data['email_tutor']}' WHERE id = {data['enrollment']} ''')
+            except:
+                return 'Hubo un problema al actualizar la información de la base de datos'
+
+            mysql.connection.commit()
+            return redirect(url_for('admin_students_modify'))
+
+    try:
+        cur.execute(f''' SELECT * FROM carrera''')
+        r_career = cur.fetchall()
+
+        cur.execute(f'''SELECT estudiante.id, nombre, primer_apellido, segundo_apellido, carrera.descripcion, semestre, correo, telefono, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, telefono_tutor, correo_tutor FROM estudiante INNER JOIN  carrera ON carrera.id = estudiante.carrera WHERE estudiante.id = '{student_key}' AND Sistema = 1''')
+        student = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos modificar commit'
+
+    return render_template('admin/students_modify_commit.html', active = 'admin_students',  student = student, r_career = r_career)
+
 
 @app.route('/administrador/estudiantes/baja', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])

@@ -1,9 +1,55 @@
 {% extends 'admin/navbar.html' %}
 
+{% macro render_professionals() %}
+{% for professional in r_professionals %}
+<tr>
+  <td>{{professional[1]}}</td>
+  <td>{{professional[2]}}</td>
+  <td>{{professional[3]}}</td>
+  <td>{{professional[4]}}</td>
+  <td>{{professional[5]}}</td>
+  <td>
+    <form action="{{ url_for('admin_schedule_personal')}}" method="POST">
+      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-professional-{{professional[0]}}">Ver Agenda</button>
+    </form>
+  </td>
+</tr>
+{% endfor %}
+{% endmacro %}
+
 {% block title %}
 Agendas
 {% endblock title %}
 
+<<<<<<< HEAD
+{% block other_content  %}
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead class="thead-dark">
+      <tr class="text-center">
+        <th scope="col">Profesionista  </th>
+        <th scope="col"> </th>
+        <th scope="col"> </th>
+        <th scope="col">Puesto</th>
+        <th scope="col">Lugar asignado</th>
+        <th scope="col">   </th>
+        <th scope="col">   </th>
+
+      </tr>
+    </thead>
+    <tbody class="text-center">
+      {{ render_professionals() }}
+    </tbody>
+  </table>
+</div>
+{% endblock other_content  %}
+
+ <!--Cómo desactivar -->
+ 	<!-- Min y MAx para html-->
+ 	<!-- Formulario de Citas-->
+ 	<!-- Agenda de profesionista-->
+ 	<!-- -->
+=======
 {% block content %}
 {% macro render_schedule() %}
 {% for schedule in r_schedules %}
@@ -42,3 +88,4 @@ Agendas
 {% endmacro %}
 
 {% endblock content %}
+>>>>>>> a7a09ddc02124bb4ba01e20a84858304b3d1189b

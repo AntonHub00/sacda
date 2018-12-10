@@ -100,24 +100,43 @@ Editar profesionista
       <label for="job">Puesto</label>
       <select id="job" name="job" class="form-control">
         {% for job in r_job %}
+<<<<<<< HEAD
+          {% if job == professional[0][6] %}
+            <option selected="selected" value="{{ professional[0][6] }}"> {{ job[1] }}</option>
+          {% endif %}
+            <option value="{{ professional[0][6] }}">{{ job[1] }}</option>
+=======
           {% if job[1] ==  professional[0][6] %}
             <option selected="selected" value="{{ job[0] }}">{{ job[1] }}</option>
           {% else %}
             <option value="{{ job[0] }}">{{ job[1] }}</option>
           {% endif %}
+>>>>>>> 85a013f919c426d16729d747d8a44c19f4b42e87
         {% endfor %}
       </select>
     </div>
+
     <div class="form-group col-md-4">
       <label for="entry_time">Hora de entrada</label>
       <select id="entry_time" name="entry_time" class="form-control">
+<<<<<<< HEAD
+        <option selected="selected" value="{{ professional[0][7] }}"> {{r_schedule[0][1]}} </option>
+        {{ render_hours(professional[0][7]) }}
+=======
         {{ render_hours(r_schedule[0][0], r_schedule[0][1]) }}
+>>>>>>> 85a013f919c426d16729d747d8a44c19f4b42e87
       </select>
     </div>
+
     <div class="form-group col-md-4">
-      <label for="exit_time">Hora de entrada</label>
+      <label for="exit_time">Hora de salida</label>
       <select id="exit_time" name="exit_time" class="form-control">
+<<<<<<< HEAD
+        <option selected="selected" value="{{ professional[0][8] }}"> {{r_schedule[0][2]}}</option>
+        {{ render_hours(professional[0][8]) }}
+=======
         {{ render_hours(r_schedule[0][0], r_schedule[0][2]) }}
+>>>>>>> 85a013f919c426d16729d747d8a44c19f4b42e87
       </select>
     </div>
   </div>
@@ -126,9 +145,15 @@ Editar profesionista
       <label for="place">Lugar</label>
       <select id="place" name="place" class="form-control">
         {% for place in r_place %}
-          {% if place[1] == professional[0][7] %}
+<<<<<<< HEAD
+          {% if place == professional[0][9] %}
+            <option  selected="selected" value="{{ place[0]}}" >{{professional[0][9]}}</option>
+          {% endif %}
+=======
+          {% if place[1] == professional[0][9] %}
             <option  selected="selected" value="{{ place[0] }}">{{ place[1] }}</option>
           {% else %}
+>>>>>>> 85a013f919c426d16729d747d8a44c19f4b42e87
             <option value="{{ place[0] }}">{{ place[1] }}</option>
           {% endif %}
         {% endfor %}
