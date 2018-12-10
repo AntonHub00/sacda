@@ -236,17 +236,17 @@ def admin_professionals_subscribe():
 
         #Check whether the fields are filled
         if '' in data.values():
-            return render_template('admin/professionals_subscribe.html', sent = 1)
+            return jsonify({'error':'Los campos no pueden estar vacíos'})
         elif not data['phone'].isdigit():
-            return render_template('admin/professionals_subscribe.html', sent = 2)
+            return jsonify({'error':'El campo teléfono debe contener únicamente números'})
         else:
             try:
                 cur.execute(f''' SELECT nombre FROM profesionista WHERE id= '{data['rfc']}' ''')
                 user = cur.fetchall()
             except:
-                return render_template('admin/professionals_subscribe.html', sent = 3)
+                return jsonify({'error':'Hubo un error al obtener información de la base de datos'})
             if user:
-                return render_template('admin/professionals_subscribe.html', sent = 4)
+                return jsonify({'error':'Ya existe un usuario con este RFC'})
 
             try:
                 cur.execute(f''' SELECT id FROM puesto WHERE descripcion = '{data['job']}' ''')
@@ -255,13 +255,13 @@ def admin_professionals_subscribe():
                 cur.execute(f''' SELECT id FROM lugar WHERE descripcion = '{data['place']}' ''')
                 data['place'] = cur.fetchall()[0][0]
             except:
-                return render_template('admin/professionals_subscribe.html', sent = 5)
+                return jsonify({'error':'Hubo un error al obtener información de la base de datos'})
 
             data['password'] = generate_password_hash(data['password'], method = 'sha256')
 
             try:
                 cur.execute(f'''
-                            insert into profesionista (id, nombre, primer_apellido, segundo_apellido, correo, telefono, puesto, contraseña, lugar)
+                            INSERT into profesionista (id, nombre, primer_apellido, segundo_apellido, correo, telefono, puesto, contraseña, lugar)
                             values
                             ('{data['rfc']}', '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', '{data['email']}', '{data['phone']}', {data['job']}, '{data['password']}', {data['place']})
                              ''')
@@ -272,12 +272,12 @@ def admin_professionals_subscribe():
                             ('{data['rfc']}', '{data['entry_time']}', '{data['exit_time']}', '{data['entry_time']}', '{data['exit_time']}', '{data['entry_time']}', '{data['exit_time']}', '{data['entry_time']}', '{data['exit_time']}', '{data['entry_time']}', '{data['exit_time']}')
                              ''')
             except:
-                return render_template('admin/professionals_subscribe.html', sent = 3)
+                return jsonify({'error':'Hubo un error al insertar información en la base de datos'})
 
             mysql.connection.commit()
 
             #Implement message of success instead
-            return render_template('admin/professionals_subscribe.html', sent = 6)
+            return jsonify({'new_url' : url_for('admin_professionals_subscribe'), 'success' : 'El profesionista se añadió correctamente' })
 
     try:
         cur.execute(''' SELECT * FROM lugar''')
@@ -286,7 +286,7 @@ def admin_professionals_subscribe():
         cur.execute(''' SELECT * FROM puesto''')
         r_job = cur.fetchall()
     except:
-        return 'Hubo un problema al obtener la información de la base de datos'
+        return jsonify({'error':'Hubo un error al obtener información de la base de datos'})
 
 
     return render_template('admin/professionals_subscribe.html', active = 'admin_professionals', r_place = r_place, r_job = r_job)
