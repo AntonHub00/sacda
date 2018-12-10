@@ -1,0 +1,16 @@
+{% extends 'admin/navbar.html' %}
+
+{% block title %}
+Estadísticas
+{% endblock title %}
+
+{% block content %}
+<div class="form-row">
+    <div class="form-group col-md-4">
+        {% for query in query_data %}
+        <p>{{ query[1] }}</p>
+        {% endfor %}
+      
+    </div>
+</div>
+{% endblock content %}
