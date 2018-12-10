@@ -106,14 +106,14 @@ Registrar alumnos
     <div class="form-group col-md-4">
       <label for="gender">Género</label>
       <select class="form-control" id="gender" name="gender">
-        <option selected>F</option>
-        <option selected>M</option>
+        <option selected>Femenino</option>
+        <option selected>Masculino</option>
       </select>
     </div>
     <div class="form-group col-md-4">
       <label for="semester">Semestre</label>
       <select class="form-control" id="semester" name="semester">
-        {% for semester in range(15) %}
+        {% for semester in range(13) %}
         <option selected>{{ semester }}</option>
         {% endfor %}
       </select>

@@ -157,6 +157,7 @@ def login():
         user = request.form['user']
         password = request.form['password']
         redirect_user = None
+        in_system = False
 
         try:
             cur.execute(f''' SELECT contraseña, sistema FROM profesionista WHERE id = '{user}' ''')
@@ -165,19 +166,23 @@ def login():
             cur.execute(f''' SELECT contraseña FROM administrador WHERE id = '{user}' ''')
             admin = cur.fetchall()
 
-            cur.execute(f''' SELECT contraseña FROM estudiante WHERE id = '{user}' ''')
+            cur.execute(f''' SELECT contraseña, sistema FROM estudiante WHERE id = '{user}' ''')
             student = cur.fetchall()
 
             if professional:
-                r_password = professional[0][0]
-                system_flag = professional[0][1]
                 redirect_user = 'professional_home'
+                r_password = professional[0][0]
+                if professional[0][1] == 1:
+                    in_system = True
             elif admin:
-                r_password = admin[0][0]
                 redirect_user = 'admin_home'
+                r_password = admin[0][0]
+                in_system = True
             elif student:
-                r_password = student[0][0]
                 redirect_user = 'student_home'
+                r_password = student[0][0]
+                if professional[0][1] == 1:
+                    in_system = True
             else:
                 return redirect(url_for('login'))
         except:
@@ -185,7 +190,7 @@ def login():
 
         #Checking if the password given is correct and is a registered user
         #TODO: add "in system" flags to student and admin
-        if check_password_hash(r_password, password):
+        if check_password_hash(r_password, password) and in_system:
             session['user'] = user
 
         return redirect(url_for(redirect_user))
