@@ -102,11 +102,11 @@ Editar alumno
     <div class="form-group col-md-4">
       <label for="semester">Semestre</label>
       <select class="form-control" id="semester" name="semester">
-        {% for semester in range(15) %}
+        {% for semester in range(14) %}
         {% if semester ==  student[0][5] %}
-            <option selected="selected" value="{{ semester[0] }}">{{ semester[1] }}</option>
+            <option selected="selected" value="{{ student[0][5 ] }}">{{ student[0][5] }}</option>
           {% endif %}
-            <option value="{{ semester[0] }}">{{ semester[1] }}</option>
+            <option value="{{ student[0][5]}}">{{ student[0][5] }}</option>
         {% endfor %}
       </select>
     </div>
