@@ -315,7 +315,7 @@ def admin_professionals_modify():
         return redirect(url_for('admin_professionals_modify_commit', professional_key = professional_key))
 
     try:
-        cur.execute(''' SELECT RFC_Profesor, NombreProf, Primer_ApellidoP, Segundo_ApellidoP, puesto.DescPuesto, lugar.DescLugar, HorarioEntrada, HorarioSalida, CorreoP, TelProf FROM profesionista INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar INNER JOIN puesto ON profesionista.Puesto = puesto.CvePuesto WHERE Sistema = 1''')
+        cur.execute(''' SELECT profesionista.id, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion, horario.lunes_entrada,horario.lunes_salida, correo, telefono FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id  WHERE sistema = 1''')
         r_professionals = cur.fetchall()
     except:
         return 'Hubo un problema al obtener la información de la base de datos'
@@ -347,8 +347,11 @@ def admin_professionals_modify_commit():
             return 'El campo teléfono debe contener unicamente números'
         else:
             try:
-                print(data.values())
-                cur.execute(f''' UPDATE profesionista SET NombreProf = '{data['name']}', Primer_ApellidoP = '{data['first_last_name']}', Segundo_ApellidoP = '{data['second_last_name']}', CorreoP = '{data['email']}', TelProf = '{data['phone']}', Puesto = {data['job']}, HorarioEntrada = '{data['entry_time']}', HorarioSalida = '{data['exit_time']}', Lugar = {data['place']} WHERE RFC_Profesor= '{data['rfc']}' ''')
+                cur.execute(f'''
+                            UPDATE horario SET lunes_entrada = '{data['entry_time']}', lunes_salida = '{data['exit_time']}', martes_entrada = '{data['entry_time']}', martes_salida = '{data['exit_time']}', miercoles_entrada = '{data['entry_time']}', miercoles_salida = '{data['exit_time']}', jueves_entrada = '{data['entry_time']}', jueves_salida = '{data['exit_time']}', viernes_entrada = '{data['entry_time']}', viernes_salida = '{data['exit_time']}' WHERE id = '{data['rfc']}';
+                        ''')
+
+                cur.execute(f''' UPDATE profesionista SET nombre = '{data['name']}', primer_apellido = '{data['first_last_name']}', segundo_apellido = '{data['second_last_name']}', correo = '{data['email']}', telefono = '{data['phone']}', puesto = {data['job']}, lugar = {data['place']} WHERE id = '{data['rfc']}' ''')
             except:
                 return 'Hubo un problema al actualizar la información de la base de datos'
 
@@ -362,12 +365,17 @@ def admin_professionals_modify_commit():
         cur.execute(f''' SELECT * FROM puesto''')
         r_job = cur.fetchall()
 
-        cur.execute(f''' SELECT RFC_Profesor, CorreoP, TelProf, NombreProf, Primer_ApellidoP, Segundo_ApellidoP, puesto.DescPuesto, HorarioEntrada, HorarioSalida, lugar.DescLugar from profesionista INNER JOIN puesto ON profesionista.Puesto = puesto.CvePuesto INNER JOIN lugar ON profesionista.Lugar = lugar.CveLugar WHERE RFC_Profesor = '{professional_key}' AND Sistema = 1''')
+        cur.execute(f''' SELECT id, lunes_entrada, lunes_salida FROM horario''')
+        r_schedule = cur.fetchall()
+
+        cur.execute(f'''
+                    SELECT profesionista.id, correo, telefono, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion from profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id WHERE profesionista.id = '{professional_key}' AND sistema = 1
+                ''')
         professional = cur.fetchall()
     except:
         return 'Hubo un problema al obtener la información de la base de datos'
 
-    return render_template('admin/professionals_modify_commit.html', active = 'admin_professionals', r_place = r_place, r_job = r_job, professional = professional)
+    return render_template('admin/professionals_modify_commit.html', active = 'admin_professionals', r_place = r_place, r_job = r_job, r_schedule = r_schedule,  professional = professional)
 
 @app.route('/administrador/estudiantes/alta', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
@@ -550,11 +558,11 @@ def student_schedule():
 def student_data():
     try:
         cur.execute(f'''
-                    SELECT nombre, primer_apellido, segundo_apellido, carrera.descripcion, semestre, correo, telefono, genero, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, telefono_tutor, correo_tutor FROM estudiante INNER JOIN carrera on estudiante.carrera = carrera.id WHERE estudiante.id = 'session['user']'
+                    SELECT nombre, primer_apellido, segundo_apellido, carrera.descripcion, semestre, correo, telefono, genero, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, telefono_tutor, correo_tutor FROM estudiante INNER JOIN carrera on estudiante.carrera = carrera.id WHERE estudiante.id = '{session['user']}'
                     ''')
         student_data = cur.fetchall()
     except:
-        return 'Hubo un problema al guadar la información en la base de datos'
+        return 'Hubo un problema al obtener la información en la base de datos'
 
     return render_template('student/data.html', active = 'student_data', student_data = student_data)
 

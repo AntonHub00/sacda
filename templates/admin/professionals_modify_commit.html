@@ -1,8 +1,13 @@
 {% extends 'admin/navbar.html' %}
 
-{% macro render_hours(got_hour) %}
+{% macro render_hours(id, got_hour) %}
 {% for hour in range(7, 21) %}
-  <option selected="selected">{{ '{:02d}:00'.format(hour) }}</option>
+{% set hour = '{:02d}:00'.format(hour) %}
+  {% if got_hour == hour and professional[0][0] == id %}
+    <option selected="selected">{{ hour }}</option>
+  {% else %}
+    <option>{{ hour }}</option>
+  {% endif %}
 {% endfor %}
 {% endmacro %}
 
@@ -95,23 +100,24 @@ Editar profesionista
       <label for="job">Puesto</label>
       <select id="job" name="job" class="form-control">
         {% for job in r_job %}
-          {% if job ==  professional[0][6] %}
+          {% if job[1] ==  professional[0][6] %}
             <option selected="selected" value="{{ job[0] }}">{{ job[1] }}</option>
-          {% endif %}
+          {% else %}
             <option value="{{ job[0] }}">{{ job[1] }}</option>
+          {% endif %}
         {% endfor %}
       </select>
     </div>
     <div class="form-group col-md-4">
       <label for="entry_time">Hora de entrada</label>
       <select id="entry_time" name="entry_time" class="form-control">
-        {{ render_hours(professional[0][7]) }}
+        {{ render_hours(r_schedule[0][0], r_schedule[0][1]) }}
       </select>
     </div>
     <div class="form-group col-md-4">
       <label for="exit_time">Hora de entrada</label>
       <select id="exit_time" name="exit_time" class="form-control">
-        {{ render_hours(professional[0][8]) }}
+        {{ render_hours(r_schedule[0][0], r_schedule[0][2]) }}
       </select>
     </div>
   </div>
@@ -120,10 +126,11 @@ Editar profesionista
       <label for="place">Lugar</label>
       <select id="place" name="place" class="form-control">
         {% for place in r_place %}
-          {% if place == professional[0][9] %}
+          {% if place[1] == professional[0][7] %}
             <option  selected="selected" value="{{ place[0] }}">{{ place[1] }}</option>
-          {% endif %}
+          {% else %}
             <option value="{{ place[0] }}">{{ place[1] }}</option>
+          {% endif %}
         {% endfor %}
       </select>
     </div>
