@@ -499,26 +499,25 @@ def admin_statistics_general():
         data['finish_date'] = request.form['finish_date']
         data['career'] = request.form['career']
         data['service'] = request.form['service']
-                
+
         try:
-            cur.execute(f''' 
+            cur.execute(f'''
                 SELECT * FROM cita INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN profesionista ON cita.id_profesionista = profesionista.id WHERE estudiante.carrera = (SELECT carrera.id FROM carrera WHERE carrera.descripcion = '{data['career']}') AND estudiante.genero = 'M' AND profesionista.puesto = (SELECT puesto.id FROM puesto WHERE puesto.descripcion = '{data['service']}') AND cita.fecha BETWEEN '{data['start_date']}' AND '{data['finish_date']}'
                 ''')
             query_data = cur.fetchall()
         except:
-            return 'Error' 
- 
-        #mysql.connection.commit()
+            return 'Hubo un problema al obtener la información de la base de datos'
+
         #return render_template('admin/statistics_general_view.html', active = 'admin_statistics_general', query_data = query_data)
         return str(query_data)
+
     try:
         cur.execute(''' SELECT * FROM carrera''')
         r_career = cur.fetchall()
         cur.execute(''' SELECT * FROM puesto''')
         r_service = cur.fetchall()
     except:
-        return 'Error'
-
+        return 'Hubo un problema al obtener la información de la base de datos'
 
     return render_template('admin/statistics_general.html', active = 'admin_statistics', r_service = r_service, r_career = r_career)
 
