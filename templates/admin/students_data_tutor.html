@@ -1,0 +1,33 @@
+{% extends 'admin/navbar.html' %}
+
+{% macro render_students() %}
+{% for student in r_students %}
+<tr>
+  <th scope="row">{{student[1]}} {{student[2]}} {{student[3]}}</th>
+  <td>{{student[4]}}</td>
+  <td>{{student[5]}}</td>
+</tr>
+{% endfor %}
+{% endmacro %}
+
+{% block title %}
+Dar de baja estudiantes
+{% endblock title %}
+
+
+{% block other_content  %}
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead class="thead-dark">
+      <tr class="text-center">
+        <th scope="col">Nombre del tutor</th>
+        <th scope="col">Correo electrónico</th>
+        <th scope="col">Teléfono</th>
+      </tr>
+    </thead>
+    <tbody class="text-center">
+      {{ render_students() }}
+    </tbody>
+  </table>
+</div>
+{% endblock other_content %}

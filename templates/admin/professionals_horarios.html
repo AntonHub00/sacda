@@ -1,0 +1,40 @@
+{% extends 'admin/navbar.html' %}
+
+{% from 'macros/_hours.html' import render_hours %}
+
+{% block title %}
+Modificar profesionistas
+{% endblock title %}
+
+{% macro render_professionals() %}
+{% for professional in r_professionals %}
+<tr>
+  <th scope="row">{{professional[0]}} {{professional[1]}} {{professional[2]}}</th>
+  <td>{{professional[3]}} - {{professional[4]}}</td>
+  <td>{{professional[5]}} - {{professional[6]}}</td>
+  <td>{{professional[7]}} - {{professional[8]}}</td>
+  <td>{{professional[9]}} - {{professional[10]}}</td>
+  <td>{{professional[11]}} - {{professional[12]}}</td>
+</tr>
+{% endfor %}
+{% endmacro %}
+
+{% block other_content  %}
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead class="thead-dark">
+      <tr class="text-center">
+        <th scope="col">Horarios de</th>
+        <th scope="col">Lunes</th>
+        <th scope="col">Martes</th>
+        <th scope="col">Miércoles</th>
+        <th scope="col">Jueves</th>
+        <th scope="col">Viernes</th>
+      </tr>
+    </thead>
+    <tbody class="text-center">
+      {{ render_professionals() }}
+    </tbody>
+  </table>
+</div>
+{% endblock other_content %}
