@@ -421,7 +421,7 @@ def admin_professionals_modify_commit():
     return render_template('admin/professionals_modify_commit.html', active = 'admin_professionals', r_place = r_place, r_job = r_job, r_schedule = r_schedule,  professional = professional)
 
 @app.route('/administrador/estudiantes/alta', methods = ['GET', 'POST'])
-@requires_access_level_and_session(roles['admin'])
+#@requires_access_level_and_session(roles['student'])
 def admin_students_subscribe():
     if request.method == 'POST':
         data = {}
