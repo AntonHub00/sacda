@@ -420,8 +420,7 @@ def admin_professionals_modify_commit():
 
     return render_template('admin/professionals_modify_commit.html', active = 'admin_professionals', r_place = r_place, r_job = r_job, r_schedule = r_schedule,  professional = professional)
 
-@app.route('/administrador/estudiantes/alta', methods = ['GET', 'POST'])
-#@requires_access_level_and_session(roles['student'])
+@app.route('/registrarme', methods = ['GET', 'POST'])
 def admin_students_subscribe():
     if request.method == 'POST':
         data = {}
@@ -446,30 +445,30 @@ def admin_students_subscribe():
         #Check whether the fields are filled
         if '' in data.values():
             #return 'Los campos no pueden estar vacíos'
-            return render_template('admin/students_subscribe.html', sent = 0)
+            return render_template('main/subscribe.html', sent = 0)
         elif not data['phone'].isdigit():
             #return 'El campo teléfono solo debe contener dígitos'
-            return render_template('admin/students_subscribe.html', sent = 1)
+            return render_template('main/subscribe.html', sent = 1)
         elif not data['enrollment'].isdigit():
             #return 'El campo matrícula solo debe contener dígitos'
-            return render_template('admin/students_subscribe.html', sent = 2)
+            return render_template('main/subscribe.html', sent = 2)
         else:
             try:
                 cur.execute(f''' SELECT nombre FROM estudiante WHERE id = '{data['enrollment']}' ''')
                 user = cur.fetchall()
             except:
                 #return 'Hubo un problema al guadar la información en la base de datos'
-                return render_template('admin/students_subscribe.html', sent = 3)
+                return render_template('main/subscribe.html', sent = 3)
             if user:
                 #return 'Ya existe un usuario registrado con esa matrícula'
-                return render_template('admin/students_subscribe.html', sent = 4)
+                return render_template('main/subscribe.html', sent = 4)
 
             try:
                 cur.execute(f''' SELECT id FROM carrera WHERE descripcion = '{data['career']}' ''')
                 data['career'] = cur.fetchall()[0][0]
             except:
                 #return 'Hubo un problema al obtener la información de la base de datos'
-                return render_template('admin/students_subscribe.html', sent = 5)
+                return render_template('main/subscribe.html', sent = 5)
 
             data['password'] = generate_password_hash(data['password'], method = 'sha256')
 
@@ -479,12 +478,12 @@ def admin_students_subscribe():
                             ''')
             except:
                 #return 'Hubo un problema al obtener la información de la base de datos'
-                return render_template('admin/students_subscribe.html', sent = 5)
+                return render_template('main/subscribe.html', sent = 5)
 
             mysql.connection.commit()
 
             #Implement message of success instead
-            return render_template('admin/students_subscribe.html', sent = 6)
+            return render_template('main/subscribe.html', sent = 6)
 
 
     try:
@@ -492,10 +491,9 @@ def admin_students_subscribe():
         r_career = cur.fetchall()
     except:
         #Error con la base
-        return render_template('admin/students_subscribe.html', sent = 5)
+        return render_template('main/subscribe.html', sent = 5)
 
-
-    return render_template('admin/students_subscribe.html', active = 'admin_students', r_career = r_career, sent = 'unknown')
+    return render_template('main/subscribe.html', active = 'admin_students', r_career = r_career, sent = 'unknown')
 
 @app.route('/administrador/estudiantes/modificar',  methods = ['GET','POST'])
 @requires_access_level_and_session(roles['admin'])
@@ -615,7 +613,6 @@ def admin_students_data_tutor():
         return 'Hubo un problema al obtener la información de la base de datos'
 
     return render_template('admin/students_data_tutor.html', active = 'admin_students', r_students = r_students)
-
 
 @app.route('/administrador/agendas')
 @requires_access_level_and_session(roles['admin'])
