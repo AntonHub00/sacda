@@ -570,15 +570,24 @@ def admin_statistics_general():
 
         try:
             cur.execute(f'''
-                SELECT * FROM cita INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN profesionista ON cita.id_profesionista = profesionista.id WHERE estudiante.carrera = (SELECT carrera.id FROM carrera WHERE carrera.descripcion = '{data['career']}') AND estudiante.genero = 'M' AND profesionista.puesto = (SELECT puesto.id FROM puesto WHERE puesto.descripcion = '{data['service']}') AND cita.fecha BETWEEN '{data['start_date']}' AND '{data['finish_date']}'
+                SELECT profesionista.id, profesionista.nombre, profesionista.primer_apellido, profesionista.segundo_apellido, puesto.descripcion, lugar.descripcion, profesionista.correo, profesionista.telefono, cita.fecha, carrera.descripcion FROM cita INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN profesionista ON cita.id_profesionista = profesionista.id INNER JOIN carrera ON estudiante.carrera = carrera.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN puesto ON profesionista.puesto = puesto.id WHERE estudiante.carrera = (SELECT carrera.id FROM carrera WHERE carrera.descripcion = '{data['career']}') AND profesionista.puesto = (SELECT puesto.id FROM puesto WHERE puesto.descripcion = '{data['service']}') AND cita.fecha BETWEEN '{data['start_date']}' AND '{data['finish_date']}'
                 ''')
             query_data = cur.fetchall()
+
+            cur.execute(f'''
+                SELECT COUNT(distinct estudiante.id) FROM cita INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN profesionista ON cita.id_profesionista = profesionista.id WHERE estudiante.carrera = (SELECT carrera.id FROM carrera WHERE carrera.descripcion = '{data['career']}') AND estudiante.genero = 'M' AND profesionista.puesto = (SELECT puesto.id FROM puesto WHERE puesto.descripcion = '{data['service']}') AND cita.fecha BETWEEN '{data['start_date']}' AND '{data['finish_date']}'
+                ''')
+            query_quantity_men = cur.fetchall()
+
+            cur.execute(f'''
+                SELECT COUNT(distinct estudiante.id) FROM cita INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN profesionista ON cita.id_profesionista = profesionista.id WHERE estudiante.carrera = (SELECT carrera.id FROM carrera WHERE carrera.descripcion = '{data['career']}') AND estudiante.genero = 'F' AND profesionista.puesto = (SELECT puesto.id FROM puesto WHERE puesto.descripcion = '{data['service']}') AND cita.fecha BETWEEN '{data['start_date']}' AND '{data['finish_date']}'
+                ''')
+            query_quantity_women = cur.fetchall()
         except:
             return 'Hubo un problema al obtener la información de la base de datos'
 
         #return render_template('admin/statistics_general_view.html', active = 'admin_statistics_general', query_data = query_data)
-        
-        return 'Alumno: ' + str(query_data[0][3])
+        return 'Fecha de la cita: ' + str(query_data[0][8]) + ', Carrera: ' + str(query_data[0][9]) + ', Profesionista: RFC: ' + str(query_data[0][0]) + ' ,Nombre: ' + str(query_data[0][1]) + ', Apeído Paterno: ' + str(query_data[0][2]) + ', Apeído Materno: ' + str(query_data[0][3]) + ', Puesto: ' + str(query_data[0][4]) + ', Lugar: ' + str(query_data[0][5]) + ', Correo: ' + str(query_data[0][6]) + ', Teléfono: ' + str(query_data[0][7]) + ', Fecha: ' + str(query_data[0][8]) + ', Cantidad de hombres: ' + str(query_quantity_men[0][0]) + ', Cantidad de mujeres: ' + str(query_quantity_women[0][0])
 
     try:
         cur.execute(''' SELECT * FROM carrera''')
@@ -590,10 +599,46 @@ def admin_statistics_general():
 
     return render_template('admin/statistics_general.html', active = 'admin_statistics', r_service = r_service, r_career = r_career)
 
-@app.route('/administrador/estadisticas/profesionistas')
+@app.route('/administrador/estadisticas/profesionistas', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
 def admin_statistics_professionals():
-    return render_template('admin/statistics_professionals.html', active = 'admin_statistics')
+    if request.method == 'POST':
+        data = {}
+
+        data['start_date'] = request.form['start_date']
+        data['finish_date'] = request.form['finish_date']
+        data['career'] = request.form['career']
+        data['service'] = request.form['service']
+
+        try:
+            cur.execute(f'''
+                SELECT profesionista.id, profesionista.nombre, profesionista.primer_apellido, profesionista.segundo_apellido, puesto.descripcion, lugar.descripcion, profesionista.correo, profesionista.telefono, cita.fecha, carrera.descripcion FROM cita INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN profesionista ON cita.id_profesionista = profesionista.id INNER JOIN carrera ON estudiante.carrera = carrera.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN puesto ON profesionista.puesto = puesto.id WHERE estudiante.carrera = (SELECT carrera.id FROM carrera WHERE carrera.descripcion = '{data['career']}') AND profesionista.puesto = (SELECT puesto.id FROM puesto WHERE puesto.descripcion = '{data['service']}') AND cita.fecha BETWEEN '{data['start_date']}' AND '{data['finish_date']}'
+                ''')
+            query_data = cur.fetchall()
+
+            cur.execute(f'''
+                SELECT COUNT(distinct estudiante.id) FROM cita INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN profesionista ON cita.id_profesionista = profesionista.id WHERE estudiante.carrera = (SELECT carrera.id FROM carrera WHERE carrera.descripcion = '{data['career']}') AND estudiante.genero = 'M' AND profesionista.puesto = (SELECT puesto.id FROM puesto WHERE puesto.descripcion = '{data['service']}') AND cita.fecha BETWEEN '{data['start_date']}' AND '{data['finish_date']}'
+                ''')
+            query_quantity_men = cur.fetchall()
+
+            cur.execute(f'''
+                SELECT COUNT(distinct estudiante.id) FROM cita INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN profesionista ON cita.id_profesionista = profesionista.id WHERE estudiante.carrera = (SELECT carrera.id FROM carrera WHERE carrera.descripcion = '{data['career']}') AND estudiante.genero = 'F' AND profesionista.puesto = (SELECT puesto.id FROM puesto WHERE puesto.descripcion = '{data['service']}') AND cita.fecha BETWEEN '{data['start_date']}' AND '{data['finish_date']}'
+                ''')
+            query_quantity_women = cur.fetchall()
+        except:
+            return 'Hubo un problema al obtener la información de la base de datos'
+
+        #return render_template('admin/statistics_general_view.html', active = 'admin_statistics_general', query_data = query_data)
+        return 'Fecha de la cita: ' + str(query_data[0][8]) + ', Carrera: ' + str(query_data[0][9]) + ', Profesionista: RFC: ' + str(query_data[0][0]) + ' ,Nombre: ' + str(query_data[0][1]) + ', Apeído Paterno: ' + str(query_data[0][2]) + ', Apeído Materno: ' + str(query_data[0][3]) + ', Puesto: ' + str(query_data[0][4]) + ', Lugar: ' + str(query_data[0][5]) + ', Correo: ' + str(query_data[0][6]) + ', Teléfono: ' + str(query_data[0][7]) + ', Fecha: ' + str(query_data[0][8]) + ', Cantidad de hombres: ' + str(query_quantity_men[0][0]) + ', Cantidad de mujeres: ' + str(query_quantity_women[0][0])
+
+    try:
+        cur.execute(''' SELECT * FROM carrera''')
+        r_career = cur.fetchall()
+        cur.execute(''' SELECT * FROM puesto''')
+        r_service = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+    return render_template('admin/statistics_professionals.html', active = 'admin_statistics', r_service = r_service, r_career = r_career)
 
 @app.route('/administrador/estadisticas/canalizaciones')
 @requires_access_level_and_session(roles['admin'])
