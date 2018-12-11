@@ -332,6 +332,38 @@ def admin_professionals_modify():
 
     return render_template('admin/professionals_modify.html', active = 'admin_professionals', r_professionals = r_professionals)
 
+@app.route('/administrador/profesionales/ver', methods = ['GET', 'POST'])
+@requires_access_level_and_session(roles['admin'])
+def admin_professionals_data():
+    if request.method == 'POST':
+        professional_key = request.form['to_select']
+
+        return redirect(url_for('admin_professionals_horario', professional_key = professional_key))
+
+    try:
+        cur.execute(''' SELECT profesionista.id, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion, horario.lunes_entrada,horario.lunes_salida, correo, telefono FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id  WHERE sistema = 1''')
+        r_professionals = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('admin/professionals_data.html', active = 'admin_professionals', r_professionals = r_professionals)
+
+@app.route('/administrador/profesionales/ver/horario', methods = ['GET', 'POST'])
+@requires_access_level_and_session(roles['admin'])
+def admin_professionals_horario():
+    if request.method == 'POST':
+        professional_key = request.form['to_select']
+
+        return redirect(url_for('admin_professionals_horario', professional_key = professional_key))
+
+    try:
+        cur.execute(''' SELECT nombre, primer_apellido, segundo_apellido, horario.lunes_entrada, horario.lunes_salida, horario.martes_entrada, horario.martes_salida, horario.miercoles_entrada, horario.miercoles_salida, horario.jueves_entrada, horario.jueves_salida, horario.viernes_entrada, horario.viernes_salida FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id WHERE sistema = 1 ''')
+        r_professionals = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('admin/professionals_horarios.html', active = 'admin_professionals', r_professionals = r_professionals)
+
 @app.route('/administrador/profesionales/modificar/editar', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
 def admin_professionals_modify_commit():
@@ -551,6 +583,40 @@ def admin_students_unsubscribe():
         return 'Hubo un problema al obtener la información de la base de datos'
 
     return render_template('admin/students_unsubscribe.html', active = 'admin_students', r_students = r_students)
+
+@app.route('/administrador/estudiantes/datos', methods = ['GET', 'POST'])
+@requires_access_level_and_session(roles['admin'])
+def admin_students_data():
+
+    if request.method == 'POST':
+        student_key = request.form['to_select']
+
+        return redirect(url_for('admin/student_data_tutor', student_key = student_key))
+
+    try:
+        cur.execute('''
+                    SELECT estudiante.id, nombre, primer_apellido, segundo_apellido, carrera.descripcion, semestre, correo, telefono, genero, faltas FROM estudiante INNER JOIN carrera on estudiante.carrera = carrera.id WHERE sistema = 1;
+                    ''')
+        r_students = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('admin/students_data.html', active = 'admin_students', r_students = r_students)
+
+@app.route('/administrador/estudiantes/datos/tutor', methods = ['GET', 'POST'])
+@requires_access_level_and_session(roles['admin'])
+def admin_students_data_tutor():
+
+    try:
+        cur.execute('''
+                    SELECT estudiante.id, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, correo_tutor, telefono_tutor FROM estudiante INNER JOIN carrera on estudiante.carrera = carrera.id WHERE sistema = 1;
+                    ''')
+        r_students = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('admin/students_data_tutor.html', active = 'admin_students', r_students = r_students)
+
 
 @app.route('/administrador/agendas')
 @requires_access_level_and_session(roles['admin'])

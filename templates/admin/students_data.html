@@ -4,34 +4,36 @@
 {% for student in r_students %}
 <tr>
   <th scope="row">{{student[0]}}</th>
-  <td>{{student[1]}}</td>
-  <td>{{student[2]}}</td>
-  <td>{{student[3]}}</td>
+  <td>{{student[1]}} {{student[2]}} {{student[3]}}</td>
   <td>{{student[4]}}</td>
   <td>{{student[5]}}</td>
+  <td>{{student[6]}}</td>
+  <td>{{student[7]}}</td>
+  <td>{{student[8]}}</td>
+  <td>{{student[9]}}</td>
   <td>
     <div class="modal" id="modal-student-{{student[0]}}" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Eliminar Alumno</h5>
+            <h5 class="modal-title">Ver datos adicionales</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <p>¿Deseas eliminar este alumno?</p>
+            <p>¿Deseas ver los datos del tutor de {{student[1]}}?</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-            <form action="{{ url_for('admin_students_unsubscribe') }}" method="POST">
-              <button type="submit" class="btn btn-primary" name="to_delete" value="{{student[0]}}"/>Eliminar</button>
+            <form action="{{ url_for('admin_students_data_tutor') }}" method="POST">
+              <button type="submit" class="btn btn-primary" name="to_delete" value="{{student[0]}}"/>Ver datos de tutor</button>
             </form>
           </div>
         </div>
       </div>
     </div>
-    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-student-{{student[0]}}">Eliminar</button>
+    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-student-{{student[0]}}">Datos de tutor</button>
   </td>
 </tr>
 {% endfor %}
@@ -49,11 +51,13 @@ Dar de baja estudiantes
       <tr class="text-center">
         <th scope="col">Matrícula</th>
         <th scope="col">Nombre</th>
-        <th scope="col">Apellido Paterno</th>
-        <th scope="col">Apellido Materno</th>
         <th scope="col">Carrera</th>
         <th scope="col">Semestre</th>
-        <th scope="col">Eliminar</th>
+        <th scope="col">Correo</th>
+        <th scope="col">Teléfono</th>
+        <th scope="col">Género</th>
+        <th scope="col">Faltas</th>
+        <th scope="col">Datos adicionales</th>
       </tr>
     </thead>
     <tbody class="text-center">
