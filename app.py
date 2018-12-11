@@ -421,7 +421,7 @@ def admin_professionals_modify_commit():
     return render_template('admin/professionals_modify_commit.html', active = 'admin_professionals', r_place = r_place, r_job = r_job, r_schedule = r_schedule,  professional = professional)
 
 @app.route('/registrarme', methods = ['GET', 'POST'])
-def admin_students_subscribe():
+def subscribe():
     if request.method == 'POST':
         data = {}
 
@@ -484,7 +484,6 @@ def admin_students_subscribe():
 
             #Implement message of success instead
             return render_template('main/subscribe.html', sent = 6)
-
 
     try:
         cur.execute(''' SELECT * FROM carrera''')
