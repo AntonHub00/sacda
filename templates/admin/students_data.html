@@ -26,8 +26,8 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-            <form action="{{ url_for('admin_students_data_tutor') }}" method="POST">
-              <button type="submit" class="btn btn-primary" name="to_delete" value="{{student[0]}}"/>Ver datos de tutor</button>
+            <form action="{{ url_for('admin_students_data') }}" method="POST">
+              <button type="submit" class="btn btn-primary" name="to_select" value="{{student[0]}}"/>Ver datos de tutor</button>
             </form>
           </div>
         </div>

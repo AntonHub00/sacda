@@ -56,10 +56,10 @@
     </div>
     <!-- End div of the statistics dropdown menu-->
 
-    {% if active == 'admin_schedule' %}
-    <a class="nav-item nav-link active text-center" href="{{ url_for('admin_schedule') }}">Agendas</a>
+    {% if active == 'admin_appointment' %}
+    <a class="nav-item nav-link active text-center" href="{{ url_for('admin_appointment') }}">Citas agendadas</a>
     {% else %}
-    <a class="nav-item nav-link text-center" href="{{ url_for('admin_schedule') }}">Agendas</a>
+    <a class="nav-item nav-link text-center" href="{{ url_for('admin_appointment') }}">Citas agendadas</a>
     {% endif %}
 
     <!-- Begining div of the statistics dropdown menu-->

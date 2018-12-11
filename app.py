@@ -588,7 +588,7 @@ def admin_students_data():
     if request.method == 'POST':
         student_key = request.form['to_select']
 
-        return redirect(url_for('admin/student_data_tutor', student_key = student_key))
+        return redirect(url_for('admin_students_data_tutor', student_key = student_key))
 
     try:
         cur.execute(f'''
@@ -603,9 +603,10 @@ def admin_students_data():
 @app.route('/administrador/estudiantes/datos/tutor', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
 def admin_students_data_tutor():
+    student_key =  request.args.get('student_key')
     try:
         cur.execute(f'''
-                    SELECT estudiante.id, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, correo_tutor, telefono_tutor FROM estudiante INNER JOIN carrera on estudiante.carrera = carrera.id WHERE sistema = 1;
+                    SELECT estudiante.id, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, correo_tutor, telefono_tutor FROM estudiante INNER JOIN carrera on estudiante.carrera = carrera.id WHERE sistema = 1 AND estudiante.id = {student_key};
                     ''')
         r_students = cur.fetchall()
     except:
@@ -654,6 +655,28 @@ def admin_statistics_general():
 @requires_access_level_and_session(roles['admin'])
 def statics_general_view():
     pass
+
+@app.route('/administrador/citas', methods = ['GET','POST'])
+@requires_access_level_and_session(roles['admin'])
+def admin_appointment():
+    if request.method == 'POST':
+        appointment_key = request.form['to_delete']
+
+        try:
+            cur.execute(f''' UPDATE cita SET sistema = 0 WHERE id = '{appointment_key}' ''')
+        except:
+            return 'Hubo un problema en actualizar la información en la base de datos'
+
+        mysql.connection.commit()
+        return redirect(url_for('admin_appointment'))
+
+    try:
+        cur.execute(f''' SELECT cita.id, profesionista.nombre, profesionista.primer_apellido, profesionista.segundo_apellido, puesto.descripcion, estudiante.nombre, estudiante.primer_apellido, estudiante.segundo_apellido,  carrera.descripcion, cita.fecha, cita.hora_inicio, cita.hora_fin, lugar.descripcion FROM cita INNER JOIN profesionista ON cita.id_profesionista = profesionista.id INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN lugar ON profesionista.lugar=lugar.id INNER JOIN carrera ON estudiante.carrera = carrera.id WHERE cita.sistema = 1 ''')
+        r_appointments = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos citas'
+
+    return render_template('admin/appointment.html', active = 'admin_appointment', r_appointments = r_appointments)
 
 @app.route('/administrador/estadisticas/profesionistas')
 @requires_access_level_and_session(roles['admin'])

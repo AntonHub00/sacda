@@ -1,0 +1,66 @@
+{% extends 'admin/navbar.html' %}
+
+{% block title %}
+Ver Citas
+{% endblock title %}
+
+{% macro render_appointments() %}
+{% for appointment in r_appointments %}
+<tr>
+  <th scope="row">{{appointment[1]}} {{appointment[2]}} {{appointment[3]}}</th>
+  <td>{{appointment[4]}}</td>
+  <td>{{appointment[5]}} {{appointment[6]}} {{appointment[7]}}</td>
+  <td>{{appointment[8]}}</td>
+  <td>{{appointment[9]}}</td>
+  <td>{{appointment[10]}} - {{appointment[11]}}</t5>
+  <td>{{appointment[12]}}</td>
+  <td>
+    <div class="modal" id="modal-appointment-{{appointment[0]}}" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Cancelar cita</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</{{appointment[3]}}{{appointment[3]}}span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>¿Deseas cancelar esta cita agendada?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <form action="{{ url_for('admin_appointment') }}" method="POST">
+              <button type="submit" class="btn btn-primary" name="to_delete" value="{{appointment[0]}}"/>Ok</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-appointment-{{appointment[0]}}">Cancelar Cita</button>
+  </td>
+</tr>
+{% endfor %}
+{% endmacro %}
+
+{% block content %}
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead class="thead-dark">
+      <tr class="text-center">
+        <th scope="col">Profesionista</th>
+        <th scope="col">Puesto de profesionista</th>
+        <th scope="col">Alumno</th>
+        <th scope="col">Carrera de alumno</th>
+        <th scope="col">Fecha</th>
+        <th scope="col">Hora</th>
+        <th scope="col">Lugar asignado</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody class="text-center">
+      {{ render_appointments() }}
+    </tbody>
+  </table>
+</div>
+
+{% endblock content %} 
