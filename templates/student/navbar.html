@@ -20,6 +20,12 @@
     <a class="nav-item nav-link text-center" href="{{ url_for('student_schedule') }}">Agendar</a>
     {% endif %}
 
+    {% if active == 'student_appointment' %}
+      <a class="nav-item nav-link active text-center" href="{{ url_for('student_appointment') }}">Ver Citas</a>
+    {% else %}
+      <a class="nav-item nav-link text-center" href="{{ url_for('student_appointment') }}">Ver Citas</a>
+    {% endif %}
+
     {% if active == 'student_data' %}
     <a class="nav-item nav-link active text-center" href="{{ url_for('student_data') }}">Mis datos</a>
     {% else %}

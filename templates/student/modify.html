@@ -1,64 +1,15 @@
-{% extends 'admin/navbar.html' %}
+{% extends 'student/navbar.html' %}
 
 {% block title %}
-Editar alumno
+Modificar mis datos
 {% endblock title %}
 
 {% block content %}
-{% if sent == 1 %}
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-  Los campos no pueden estar vacíos
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-{%endif%}
-{% if sent == 2 %}
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-  El campo teléfono solo debe contener dígitos
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-{% endif%}
-{% if sent == 3 %}
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-  Hubo un problema al guadar la información en la base de datos
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-{% endif%}
-{% if sent == 4 %}
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-  Hubo un problema al actualizar la información de la base de datos
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-{% endif%}
-{% if sent == 5 %}
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-  Hubo un problema al obtener la información de la base de datos
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-{% endif%}
-{% if sent == 6 %}
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-  El profesionista fue registrado con Éxito
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-{% endif%}
-
-<form method="POST" action="{{ url_for('admin_students_modify_commit') }}">
+<form method="POST" action="{{ url_for('student_modify') }}">
   <div class="form-row">
     <div class="form-group col-md-4">
-      <label for="rfc">Matrícula</label>
-      <input type="text" class="form-control" id="enrollment" name="enrollment" placeholder="RFC" maxlength="15" readonly="readonly" value="{{ student[0][0] }}">
+      <label for="id">Matrícula</label>
+      <input type="text" class="form-control" id="enrollment" name="enrollment" placeholder="Matricula" maxlength="15" readonly="readonly" value="{{ student[0][0] }}">
     </div>
     <div class="form-group col-md-4">
       <label for="email">Correo electrónico</label>
@@ -90,11 +41,11 @@ Editar alumno
       <label for="career">Carreras</label>
       <select id="career" name="career" class="form-control">
         {% for career in r_career %}
-          {% if career[1] == student[0][4]%}
-            <option  selected="selected" value="{{ career[0] }}">{{ career[1] }}</option>
+        	{% if career[1] == student[0][4] %}
+            <option selected="selected" value="{{ career[0] }}">{{ career[1] }}</option>
           {% else %}
             <option value="{{ career[0]}}">{{ career[1] }}</option>
-            {% endif %}
+          {% endif %}
         {% endfor %}
       </select>
     </div>
