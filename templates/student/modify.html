@@ -1,0 +1,110 @@
+{% extends 'student/navbar.html' %}
+
+{% block title %}
+Modificar mis datos
+{% endblock title %}
+
+{% block content %}
+<form method="POST" action="{{ url_for('student_modify') }}">
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="id">Matrícula</label>
+      <input type="text" class="form-control" id="enrollment" name="enrollment" placeholder="Matricula" maxlength="15" readonly="readonly" value="{{ student[0][0] }}">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="email">Correo electrónico</label>
+      <input type="email" class="form-control" id="email" name="email" placeholder="Correo electrónico" maxlength="35" value="{{ student[0][6] }}">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="phone">Teléfono</label>
+      <input type="text" class="form-control" id="phone" name="phone" placeholder="Teléfono" maxlength="14" value="{{ student[0][7] }}">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="name">Nombre</label>
+      <input type="text" class="form-control" id="name" name="name" placeholder="Nombre" maxlength="35" value="{{ student[0][1] }}">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="first_last_name">Apellido Paterno</label>
+      <input type="text" class="form-control" id="first_last_name" name="first_last_name" placeholder="Apellido Paterno" maxlength="25" value="{{ student[0][2] }}">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="second_last_name">Apellido Materno</label>
+      <input type="text" class="form-control" id="second_last_name" name="second_last_name" placeholder="Apellido Materno" maxlength="25" value="{{ student[0][3] }}">
+    </div>
+  </div>
+  <div class="form-row">
+  </div>
+  <div class="form-row">
+  	<div class="form-group col-md-4">
+      <label for="career">Carreras</label>
+      <select id="career" name="career" class="form-control">
+        {% for career in r_career %}
+        	{% if career == student[0][4] %}
+            <option  selected="selected" value="{{ career[0] }}">{{ career[1] }}</option>
+         	{% endif %}
+            <option value="{{ career[0]}}">{{ career[1] }}</option>
+
+          {% if career[1] == student[0][4]%}
+            <option  selected="selected" value="{{ career[0] }}">{{ career[1] }}</option>
+          {% else %}
+            <option value="{{ career[0]}}">{{ career[1] }}</option>
+            {% endif %}
+        {% endfor %}
+      </select>
+    </div>
+  	<div class="form-group col-md-4">
+      <label for="gender">Género</label>
+      <select id="gender" name="gender" class="form-control">
+        {% if student[0][13] == 'Masculino' %}
+          <option selected="selected">Masculino</option>
+          <option>Femenino</option>
+        {% else %}
+          <option selected="selected">Femenino</option>
+          <option>Masculino</option>
+        {% endif %}
+      </select>
+    </div>
+    <div class="form-group col-md-4">
+      <label for="semester">Semestre</label>
+      <select class="form-control" id="semester" name="semester">
+        {% for semester in range(14) %}
+          {% if semester ==  student[0][5] %}
+            <option selected="selected" value="{{ semester }}">{{ semester }}</option>
+          {% endif %}
+          {%if semester[1] == student[0][5] %}
+            <option selected="selected" value="{{ semester }}">{{ semester }}</option>
+          {% else %}
+            <option value="{{ semester }}">{{ semester }}</option>
+          {% endif%}
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="name_tutor">Nombre Del Tutor</label>
+      <input type="text" class="form-control" id="name_tutor" name="name_tutor" placeholder="Nombre Del Tutor" maxlength="30" value="{{student[0][8]}}">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="first_last_name_tutor">Primer Apellido Del Tutor</label>
+      <input type="text" class="form-control" id="first_last_name_tutor" name="first_last_name_tutor" placeholder="Primer Apellido del Tutor" maxlength="25" value="{{student[0][9]}}">
+    </div>
+    <div class="form-group col-md-4">
+      <label for="second_last_name_tutor">Segundo Apellido Del Tutor</label>
+      <input type="text" class="form-control" id="second_last_name_tutor" name="second_last_name_tutor" placeholder="Segundo Apellido del Tutor" maxlength="25" value="{{student[0][10]}}">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="phone_tutor">Teléfono Del Tutor</label>
+      <input type="text" class="form-control" id="phone_tutor" name="phone_tutor" placeholder="Teléfono del Tutor" maxlength="14" value="{{student[0][11]}}">
+    </div>
+    <div class="form-group col-md-6">
+      <label for="email_tutor">Correo Del Tutor</label>
+      <input type="email" class="form-control" id="email_tutor" name="email_tutor" placeholder="Correo del Tutor" maxlength="30" value="{{student[0][12]}}">
+    </div>
+  <button type="submit" class="btn btn-primary btn-block">Actualizar</button>
+</form>
+{% endblock content %}
