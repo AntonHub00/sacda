@@ -24,7 +24,7 @@ app.config['MAIL_USE_SSL'] = True
 app.config['MYSQL_HOST'] = '127.0.0.1'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'sacda'
+app.config['MYSQL_DB'] = 'sacda_testing'
 
 mysql = MySQL(app)
 mail = Mail(app)
