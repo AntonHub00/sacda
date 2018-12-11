@@ -24,7 +24,7 @@ app.config['MAIL_USE_SSL'] = True
 app.config['MYSQL_HOST'] = '127.0.0.1'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'sacda_testing'
+app.config['MYSQL_DB'] = 'sacda'
 
 mysql = MySQL(app)
 mail = Mail(app)
@@ -726,7 +726,7 @@ def student_appointment():
         return redirect(url_for('student_appointment'))
 
     try:
-        cur.execute(f''' SELECT cita.id, profesionista.nombre, profesionista.primer_apellido,fecha, hora_inicio, hora_fin, puesto.descripcion, lugar.descripcion FROM cita INNER JOIN profesionista ON cita.id_profesionista = profesionista.id INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id WHERE cita.id_estudiante = '{session['user']}' ''')
+        cur.execute(f''' SELECT cita.id, profesionista.nombre, profesionista.primer_apellido,fecha, hora_inicio, hora_fin, puesto.descripcion, lugar.descripcion FROM cita INNER JOIN profesionista ON cita.id_profesionista = profesionista.id INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id WHERE cita.id_estudiante = '{session['user']}' AND cita.sistema = 1 ''')
         r_appointments = cur.fetchall()
     except:
         return 'Hubo un problema al obtener la información de la base de datos citas'
