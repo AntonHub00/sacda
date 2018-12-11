@@ -351,13 +351,14 @@ def admin_professionals_data():
 @app.route('/administrador/profesionales/ver/horario', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
 def admin_professionals_horario():
+    professional_key = request.args.get('professional_key')
     if request.method == 'POST':
         professional_key = request.form['to_select']
 
         return redirect(url_for('admin_professionals_horario', professional_key = professional_key))
 
     try:
-        cur.execute(f''' SELECT nombre, primer_apellido, segundo_apellido, horario.lunes_entrada, horario.lunes_salida, horario.martes_entrada, horario.martes_salida, horario.miercoles_entrada, horario.miercoles_salida, horario.jueves_entrada, horario.jueves_salida, horario.viernes_entrada, horario.viernes_salida FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id WHERE sistema = 1 ''')
+        cur.execute(f''' SELECT nombre, primer_apellido, segundo_apellido, horario.lunes_entrada, horario.lunes_salida, horario.martes_entrada, horario.martes_salida, horario.miercoles_entrada, horario.miercoles_salida, horario.jueves_entrada, horario.jueves_salida, horario.viernes_entrada, horario.viernes_salida FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id WHERE profesionista.id = '{professional_key}' AND sistema = 1 ''')
         r_professionals = cur.fetchall()
     except:
         return 'Hubo un problema al obtener la información de la base de datos'
