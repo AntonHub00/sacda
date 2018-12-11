@@ -4,9 +4,7 @@
 Estadísitcas generales
 {% endblock title %}
 
-
 {% block content %}
-
 <form method="POST" action="{{ url_for('admin_statistics_general') }}">
   <div class="form-row">
     <div class="form-group col-md-4">
@@ -18,13 +16,12 @@ Estadísitcas generales
       <input type="text" class="form-control" id="finish_date" name="finish_date" placeholder="año-mes-día" maxlength="10">
     </div>
   </div>
-
   <div class="form-row">
     <div class="form-group col-md-4">
       <label for="career">Carreras</label>
       <select id="career" name="career" class="form-control">
         {% for career in r_career %}
-        <option selected>{{ career[1] }}</option>
+          <option selected>{{ career[1] }}</option>
         {% endfor %}
       </select>
     </div>
@@ -32,13 +29,11 @@ Estadísitcas generales
       <label for="service">Puesto</label>
       <select id="service" name="service" class="form-control">
         {% for service in r_service %}
-        <option selected>{{ service[1] }}</option>
+          <option selected>{{ service[1] }}</option>
         {% endfor %}
       </select>
     </div>
   </div>
-
- 
   <button type="submit" class="btn btn-primary btn-block">Consultar</button>
 </form>
 {% endblock content %}

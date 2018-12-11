@@ -15,6 +15,9 @@
   <link rel="stylesheet" href="{{ url_for('static', filename = 'css/base_navbar_styles.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename = 'css/login_styles.css') }}">
 
+  <!-- date-picker -->
+  <link rel="stylesheet" href="{{ url_for('static', filename = 'vendor/date_picker/css/bootstrap-datepicker.css') }}">
+
   <title>
     {% block title %}
     {% endblock title %}
@@ -37,9 +40,14 @@
 
 
   <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <!-- jQuery first, then Popper.js, Bootstrap JS , then date-picker -->
   <script src="{{ url_for('static', filename = 'vendor/jquery/jquery-3.3.1.min.js') }}"></script>
   <script src="{{ url_for('static', filename = 'vendor/popper/popper.min.js') }}"></script>
   <script src="{{ url_for('static', filename = 'vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'vendor/date_picker/js/bootstrap-datepicker.min.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'vendor/date_picker/locales/bootstrap-datepicker.es.min.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'js/date_picker/date_picker.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'js/main/login_process.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'js/admin/subscribe_professional_process.js') }}"></script>
 </body>
 </html>
