@@ -686,6 +686,28 @@ def professional_home():
 def professional_schedule():
     return render_template('professional/schedule.html', active = 'professional_schedule')
 
+@app.route('/profesionista/citas', methods = ['GET','POST'])
+@requires_access_level_and_session(roles['professional'])
+def professional_appointment():
+    if request.method == 'POST':
+        appointment_key = request.form['to_delete']
+
+        try:
+            cur.execute(f''' UPDATE cita SET sistema = 0 WHERE id = '{appointment_key}' ''')
+        except:
+            return 'Hubo un problema en actualizar la información en la base de datos'
+
+        mysql.connection.commit()
+        return redirect(url_for('professional_appointment'))
+
+    try:
+        cur.execute(f''' SELECT cita.id, estudiante.nombre, estudiante.primer_apellido, estudiante.segundo_apellido, cita.fecha, cita.hora_inicio, cita.hora_fin, carrera.descripcion, lugar.descripcion FROM cita INNER JOIN profesionista ON cita.id_profesionista = profesionista.id INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN lugar ON profesionista.lugar=lugar.id INNER JOIN carrera ON estudiante.carrera = carrera.id WHERE profesionista.id = '{session['user']}' AND cita.sistema = 1 ''')
+        r_appointments = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos citas'
+
+    return render_template('professional/appointment.html', active = 'professional_appointment', r_appointments = r_appointments)
+
 @app.route('/profesionista/datos')
 @requires_access_level_and_session(roles['professional'])
 def professional_data():

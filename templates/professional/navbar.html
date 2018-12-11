@@ -20,6 +20,12 @@
     <a class="nav-item nav-link text-center" href="{{ url_for('professional_schedule') }}">Agenda</a>
     {% endif %}
 
+    {% if active == 'professional_appointment' %}
+    <a class="nav-item nav-link active text-center" href="{{ url_for('professional_appointment') }}">Mis citas</a>
+    {% else %}
+    <a class="nav-item nav-link text-center" href="{{ url_for('professional_appointment') }}">Mis citas</a>
+    {% endif %}
+
     {% if active == 'professional_data' %}
     <a class="nav-item nav-link active text-center" href="{{ url_for('professional_data') }}">Mis datos</a>
     {% else %}
