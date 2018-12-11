@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, request, redirect, url_for
+from flask import Flask, render_template, session, request, redirect, url_for, jsonify
 from flask_mysqldb import MySQL
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
@@ -154,41 +154,51 @@ def change_password(token):
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = request.form['user']
-        password = request.form['password']
+        data = {}
+        data['user'] = request.form['user']
+        data['password'] = request.form['password']
         redirect_user = None
+        in_system = False
+
+        if '' in data.values():
+            return jsonify({'error':'Los campos no pueden estar vacíos'})
 
         try:
-            cur.execute(f''' SELECT contraseña, sistema FROM profesionista WHERE id = '{user}' ''')
+            cur.execute(f''' SELECT contraseña, sistema FROM profesionista WHERE id = '{data['user']}' ''')
             professional = cur.fetchall()
 
-            cur.execute(f''' SELECT contraseña FROM administrador WHERE id = '{user}' ''')
+            cur.execute(f''' SELECT contraseña FROM administrador WHERE id = '{data['user']}' ''')
             admin = cur.fetchall()
 
-            cur.execute(f''' SELECT contraseña FROM estudiante WHERE id = '{user}' ''')
+            cur.execute(f''' SELECT contraseña, sistema FROM estudiante WHERE id = '{data['user']}' ''')
             student = cur.fetchall()
 
             if professional:
-                r_password = professional[0][0]
-                system_flag = professional[0][1]
                 redirect_user = 'professional_home'
+                r_password = professional[0][0]
+                if professional[0][1] == 1:
+                    in_system = True
             elif admin:
-                r_password = admin[0][0]
                 redirect_user = 'admin_home'
+                r_password = admin[0][0]
+                in_system = True
             elif student:
-                r_password = student[0][0]
                 redirect_user = 'student_home'
+                r_password = student[0][0]
+                if student[0][1] == 1:
+                    in_system = True
             else:
-                return redirect(url_for('login'))
+                return jsonify({'error':'La contraseña o el usuario son incorrectos'})
         except:
-            return 'Hubo un problema al obtener la información de la base de datos'
+            return jsonify({'error':'Hubo un problema al obtener la información de la base de datos'})
 
         #Checking if the password given is correct and is a registered user
         #TODO: add "in system" flags to student and admin
-        if check_password_hash(r_password, password):
-            session['user'] = user
+        if check_password_hash(r_password, data['password']) and in_system:
+            session['user'] = data['user']
+            return jsonify({'new_url' : url_for(redirect_user) })
 
-        return redirect(url_for(redirect_user))
+        return jsonify({'error':'La contraseña o el usuario son incorrectos'})
 
     return render_template('main/login.html')
 
@@ -226,17 +236,17 @@ def admin_professionals_subscribe():
 
         #Check whether the fields are filled
         if '' in data.values():
-            return render_template('admin/professionals_subscribe.html', sent = 1)
+            return jsonify({'error':'Los campos no pueden estar vacíos'})
         elif not data['phone'].isdigit():
-            return render_template('admin/professionals_subscribe.html', sent = 2)
+            return jsonify({'error':'El campo teléfono debe contener únicamente números'})
         else:
             try:
                 cur.execute(f''' SELECT nombre FROM profesionista WHERE id= '{data['rfc']}' ''')
                 user = cur.fetchall()
             except:
-                return render_template('admin/professionals_subscribe.html', sent = 3)
+                return jsonify({'error':'Hubo un error al obtener información de la base de datos'})
             if user:
-                return render_template('admin/professionals_subscribe.html', sent = 4)
+                return jsonify({'error':'Ya existe un usuario con este RFC'})
 
             try:
                 cur.execute(f''' SELECT id FROM puesto WHERE descripcion = '{data['job']}' ''')
@@ -245,13 +255,13 @@ def admin_professionals_subscribe():
                 cur.execute(f''' SELECT id FROM lugar WHERE descripcion = '{data['place']}' ''')
                 data['place'] = cur.fetchall()[0][0]
             except:
-                return render_template('admin/professionals_subscribe.html', sent = 5)
+                return jsonify({'error':'Hubo un error al obtener información de la base de datos'})
 
             data['password'] = generate_password_hash(data['password'], method = 'sha256')
 
             try:
                 cur.execute(f'''
-                            insert into profesionista (id, nombre, primer_apellido, segundo_apellido, correo, telefono, puesto, contraseña, lugar)
+                            INSERT into profesionista (id, nombre, primer_apellido, segundo_apellido, correo, telefono, puesto, contraseña, lugar)
                             values
                             ('{data['rfc']}', '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', '{data['email']}', '{data['phone']}', {data['job']}, '{data['password']}', {data['place']})
                              ''')
@@ -262,12 +272,12 @@ def admin_professionals_subscribe():
                             ('{data['rfc']}', '{data['entry_time']}', '{data['exit_time']}', '{data['entry_time']}', '{data['exit_time']}', '{data['entry_time']}', '{data['exit_time']}', '{data['entry_time']}', '{data['exit_time']}', '{data['entry_time']}', '{data['exit_time']}')
                              ''')
             except:
-                return render_template('admin/professionals_subscribe.html', sent = 3)
+                return jsonify({'error':'Hubo un error al insertar información en la base de datos'})
 
             mysql.connection.commit()
 
             #Implement message of success instead
-            return render_template('admin/professionals_subscribe.html', sent = 6)
+            return jsonify({'new_url' : url_for('admin_professionals_subscribe'), 'success' : 'El profesionista se añadió correctamente' })
 
     try:
         cur.execute(''' SELECT * FROM lugar''')
@@ -276,7 +286,7 @@ def admin_professionals_subscribe():
         cur.execute(''' SELECT * FROM puesto''')
         r_job = cur.fetchall()
     except:
-        return 'Hubo un problema al obtener la información de la base de datos'
+        return jsonify({'error':'Hubo un error al obtener información de la base de datos'})
 
 
     return render_template('admin/professionals_subscribe.html', active = 'admin_professionals', r_place = r_place, r_job = r_job)
@@ -397,11 +407,11 @@ def admin_professionals_modify_commit():
         cur.execute(f''' SELECT * FROM puesto''')
         r_job = cur.fetchall()
 
-        cur.execute(f''' SELECT id, lunes_entrada, lunes_salida FROM horario''')
+        cur.execute(f''' SELECT id, lunes_entrada, lunes_salida FROM horario WHERE id = {professional_key} ''')
         r_schedule = cur.fetchall()
 
         cur.execute(f'''
-                    SELECT profesionista.id, correo, telefono, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion from profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id WHERE profesionista.id = '{professional_key}' AND sistema = 1
+                    SELECT profesionista.id, correo, telefono, nombre, primer_apellido, segundo_apellido, puesto.descripcion, horario.lunes_entrada, horario.lunes_salida, lugar.descripcion from profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON horario.id = profesionista.id WHERE profesionista.id = '{professional_key}' AND sistema = 1
                 ''')
         professional = cur.fetchall()
     except:
@@ -485,11 +495,69 @@ def admin_students_subscribe():
 
 
     return render_template('admin/students_subscribe.html', active = 'admin_students', r_career = r_career, sent = 'unknown')
-    #FIN
-@app.route('/administrador/estudiantes/modificar')
+
+@app.route('/administrador/estudiantes/modificar',  methods = ['GET','POST'])
 @requires_access_level_and_session(roles['admin'])
 def admin_students_modify():
-    return render_template('admin/students_modify.html', active = 'admin_students')
+    if request.method == 'POST':
+        student_key = request.form['to_select']
+        return redirect(url_for('admin_students_modify_commit', student_key = student_key))
+
+    try:
+        cur.execute(f''' SELECT estudiante.id, nombre, primer_apellido, segundo_apellido, carrera.descripcion, semestre, correo, telefono FROM estudiante INNER JOIN  carrera ON carrera.id = estudiante.carrera WHERE Sistema = 1''')
+        r_students = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('admin/students_modify.html', active = 'admin_students', r_students = r_students)
+
+@app.route('/administrador/estudiantes/modificar/editardatos', methods = ['GET', 'POST'])
+@requires_access_level_and_session(roles['admin'])
+def admin_students_modify_commit():
+    student_key =  request.args.get('student_key')
+    if request.method == 'POST':
+        data = {}
+
+        data['name'] = request.form['name']
+        data['first_last_name'] = request.form['first_last_name']
+        data['second_last_name'] = request.form['second_last_name']
+        data['enrollment'] = request.form['enrollment']
+        data['email'] = request.form['email']
+        data['phone'] = request.form['phone']
+        data['career'] = request.form['career']
+        data['gender'] = request.form['gender']
+        data['semester'] = request.form['semester']
+        #Tutor
+        data['name_tutor'] = request.form['name_tutor']
+        data['first_last_name_tutor'] = request.form['first_last_name_tutor']
+        data['second_last_name_tutor'] = request.form['second_last_name_tutor']
+        data['phone_tutor'] = request.form['phone_tutor']
+        data['email_tutor'] = request.form['email_tutor']
+
+        #Check whether the fields are filled
+        if '' in data.values():
+            return 'Los campos no puedes estar vacíos'
+        elif not data['phone'].isdigit():
+            return 'El campo teléfono debe contener unicamente números'
+        else:
+            try:
+                cur.execute(f''' UPDATE estudiante SET nombre = '{data['name']}', primer_apellido = '{data['first_last_name']}', segundo_apellido = '{data['second_last_name']}', correo = '{data['email']}', telefono = '{data['phone']}', carrera = {data['career']}, semestre = {data['semester']}, nombre_tutor = '{data['name_tutor']}', primer_apellido_tutor = '{data['first_last_name_tutor']}', segundo_apellido_tutor = '{data['second_last_name_tutor']}', telefono_tutor = '{data['phone_tutor']}', correo_tutor = '{data['email_tutor']}', genero = '{data['gender']}' WHERE id = {data['enrollment']} ''')
+            except:
+                return 'Hubo un problema al actualizar la información de la base de datos'
+
+            mysql.connection.commit()
+            return redirect(url_for('admin_students_modify'))
+
+    try:
+        cur.execute(f''' SELECT * FROM carrera''')
+        r_career = cur.fetchall()
+
+        cur.execute(f'''SELECT estudiante.id, nombre, primer_apellido, segundo_apellido, carrera.descripcion, semestre, correo, telefono, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, telefono_tutor, correo_tutor, genero FROM estudiante INNER JOIN carrera ON carrera.id = estudiante.carrera WHERE estudiante.id = '{student_key}' AND sistema = 1''')
+        student = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos modificar commit'
+
+    return render_template('admin/students_modify_commit.html', active = 'admin_students',  student = student, r_career = r_career)
 
 @app.route('/administrador/estudiantes/baja', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
@@ -555,10 +623,37 @@ def admin_students_data_tutor():
 def admin_schedule():
     return render_template('admin/schedule.html', active = 'admin_schedule')
 
-@app.route('/administrador/estadisticas/generales')
+@app.route('/administrador/estadisticas/generales', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
 def admin_statistics_general():
-    return render_template('admin/statistics_general.html', active = 'admin_statistics')
+    if request.method == 'POST':
+        data = {}
+
+        data['start_date'] = request.form['start_date']
+        data['finish_date'] = request.form['finish_date']
+        data['career'] = request.form['career']
+        data['service'] = request.form['service']
+
+        try:
+            cur.execute(f'''
+                SELECT * FROM cita INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN profesionista ON cita.id_profesionista = profesionista.id WHERE estudiante.carrera = (SELECT carrera.id FROM carrera WHERE carrera.descripcion = '{data['career']}') AND estudiante.genero = 'M' AND profesionista.puesto = (SELECT puesto.id FROM puesto WHERE puesto.descripcion = '{data['service']}') AND cita.fecha BETWEEN '{data['start_date']}' AND '{data['finish_date']}'
+                ''')
+            query_data = cur.fetchall()
+        except:
+            return 'Hubo un problema al obtener la información de la base de datos'
+
+        #return render_template('admin/statistics_general_view.html', active = 'admin_statistics_general', query_data = query_data)
+        return str(query_data)
+
+    try:
+        cur.execute(''' SELECT * FROM carrera''')
+        r_career = cur.fetchall()
+        cur.execute(''' SELECT * FROM puesto''')
+        r_service = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('admin/statistics_general.html', active = 'admin_statistics', r_service = r_service, r_career = r_career)
 
 @app.route('/administrador/estadisticas/profesionistas')
 @requires_access_level_and_session(roles['admin'])

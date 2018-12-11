@@ -1,5 +1,76 @@
 {% extends 'admin/navbar.html' %}
 
+{% macro render_students() %}
+{% for student in r_students %}
+<tr>
+  <th scope="row">{{student[0]}}</th>
+  <td>{{student[1]}}</td>
+  <td>{{student[2]}}</td>
+  <td>{{student[3]}}</td>
+  <td>{{student[4]}}</td>
+  <td>{{student[5]}}</td>
+  <td>{{student[6]}}</td>
+  <td>{{student[7]}}</td>
+  <td>
+    <div class="modal" id="modal-student-{{student[0]}}" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modificar Alumno</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>¿Deseas modificar este alumno?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <form action="{{ url_for('admin_students_modify') }}" method="POST">
+              <button type="submit" class="btn btn-primary" name="to_select" value="{{student[0]}}"/>Modificar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#modal-student-{{student[0]}}">Modificar</button>
+  </td>
+</tr>
+{% endfor %}
+{% endmacro %}
+
 {% block title %}
 Modificar estudiantes
 {% endblock title %}
+
+
+{% block other_content  %}
+{% if sent == 1 %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  Hubo un problema al guadar la información en la base de datos
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif%}
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead class="thead-dark">
+      <tr class="text-center">
+        <th scope="col">Matrícula</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">Apellido Paterno</th>
+        <th scope="col">Apellido Materno</th>
+        <th scope="col">Carrera</th>
+        <th scope="col">Semestre</th>
+        <th scope="col">Correo</th>
+        <th scope="col">Teléfono</th>
+        <th scope="col">Modificar</th>
+      </tr>
+    </thead>
+    <tbody class="text-center">
+      {{ render_students() }}
+    </tbody>
+  </table>
+</div>
+{% endblock other_content %}
