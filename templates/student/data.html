@@ -16,6 +16,29 @@ Mis datos
   <p class="data">Nombre de tutor: {{ student_data[0][8] }} {{ student_data[0][9] }} {{ student_data[0][10] }}</p>
   <p class="data">Teléfono tutor: {{ student_data[0][11] }}</p>
   <p class="data">Correo de tutor: {{ student_data[0][12] }}</p>
+
+  <div class="modal" id="modal-student-{{student_data[0][13]}}" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modificar Alumno</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>¿Deseas modificar tus datos?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <form action="{{ url_for('student_data') }}" method="POST">
+              <button type="submit" class="btn btn-primary" name="to_select" value="{{student_data[0][13]}}"/>Modificar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#modal-student-{{student_data[0][13]}}">Modificar</button>
   <hr class="my-4">
   <p>SACDA es tu lugar para visualizar las citas agendadas por los alumnos del Instituto Tecnológico de Morelia interesados en este servicio</p>
 </div>

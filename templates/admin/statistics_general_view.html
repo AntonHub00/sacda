@@ -5,11 +5,49 @@ Estadísticas
 {% endblock title %}
 
 {% block content %}
-<div class="form-row">
-    <div class="form-group col-md-4">
-        {% for query in query_data %}
-          <p>{{ query[1] }}</p>
-        {% endfor %}
+{%macro render_query() %}
+{% for query in query_data %}
+<tr>
+	<td><p>{{ query[1] }}</p></td>
+	<td><p>{{ query[2] }}</p></td>
+</tr>
+{% endfor %}
+{% endmacro	%}
+
+<div class="table-responsive">
+  <div class="row">
+    <div class="col-sm">
+      Periodo: 
     </div>
+    <div class="col-sm">
+      Año: 
+    </div>
+  </div>
+  <div class="row">
+  	<div class="col-sm">
+  		Puesto: {{query_data[1]}}
+  	</div>
+  	<div class="col-sm">
+  		Carrera:{{query_data[5]}}
+  	</div>
+  </div>
+  <div class="row">
+  	<div class="col-sm">
+  		<table class="table table-striped">
+		    <thead class="thead-blue">
+		      	<tr class="text-center">
+		        	<th scope="col">Profesionista</th>
+		        	<th scope="col">Cantidad de Hombres </th>
+		        	<th scope="col">Cantidad de Mujeres</th>
+		        	<th scope="col"> Cantidad Total</th>		      
+		    	</tr>
+		    </thead>
+		    <tbody class="text-center">
+		     	{{render_query()}}
+		    </tbody>
+		</table>
+  	</div>
+  </div>
 </div>
+
 {% endblock content %}
