@@ -502,7 +502,7 @@ def admin_statistics_general():
  
         #mysql.connection.commit()
         #return render_template('admin/statistics_general_view.html', active = 'admin_statistics_general', query_data = query_data)
-        return str(query_data)
+        return 'Alumno: ' + str(query_data[0][3])
     try:
         cur.execute(''' SELECT * FROM carrera''')
         r_career = cur.fetchall()
