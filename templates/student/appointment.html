@@ -1,0 +1,62 @@
+{% extends 'student/navbar.html' %}
+
+{% block title %}
+Ver Citas
+{% endblock title %}
+
+{% macro render_appointments() %}
+{% for appointment in r_appointments %}
+<tr>
+  <th scope="row">{{appointment[1]}} {{appointment[2]}}</th>
+  <td>{{appointment[3]}}</td>
+  <td>{{appointment[4]}}</td>
+  <td>{{appointment[5]}}</td>
+  <td>{{appointment[6]}}</td>
+  <td>
+    <div class="modal" id="modal-appointment-{{appointment[0]}}" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Cancelar cita</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>¿Deseas cancelar tu cita?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            <form action="{{ url_for('student_appointment') }}" method="POST">
+              <button type="submit" class="btn btn-primary" name="to_delete" value="{{appointment[0]}}"/>Ok</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-appointment-{{appointment[0]}}">Cancelar Cita</button>
+  </td>
+</tr>
+{% endfor %}
+{% endmacro %}
+
+{% block content %}
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead class="thead-dark">
+      <tr class="text-center">
+        <th scope="col">Profesionista</th>
+        <th scope="col">Fecha</th>
+        <th scope="col">Hora</th>
+        <th scope="col">Puesto</th>
+        <th scope="col">Lugar asignado</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody class="text-center">
+      {{ render_appointments() }}
+    </tbody>
+  </table>
+</div>
+
+{% endblock content %} 
