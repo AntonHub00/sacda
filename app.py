@@ -325,7 +325,7 @@ def admin_professionals_modify():
         return redirect(url_for('admin_professionals_modify_commit', professional_key = professional_key))
 
     try:
-        cur.execute(''' SELECT profesionista.id, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion, horario.lunes_entrada,horario.lunes_salida, correo, telefono FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id  WHERE sistema = 1''')
+        cur.execute(f''' SELECT profesionista.id, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion, horario.lunes_entrada,horario.lunes_salida, correo, telefono FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id  WHERE sistema = 1''')
         r_professionals = cur.fetchall()
     except:
         return 'Hubo un problema al obtener la información de la base de datos'
@@ -341,7 +341,7 @@ def admin_professionals_data():
         return redirect(url_for('admin_professionals_horario', professional_key = professional_key))
 
     try:
-        cur.execute(''' SELECT profesionista.id, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion, horario.lunes_entrada,horario.lunes_salida, correo, telefono FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id  WHERE sistema = 1''')
+        cur.execute(f''' SELECT profesionista.id, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion, horario.lunes_entrada,horario.lunes_salida, correo, telefono FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id  WHERE sistema = 1''')
         r_professionals = cur.fetchall()
     except:
         return 'Hubo un problema al obtener la información de la base de datos'
@@ -357,7 +357,7 @@ def admin_professionals_horario():
         return redirect(url_for('admin_professionals_horario', professional_key = professional_key))
 
     try:
-        cur.execute(''' SELECT nombre, primer_apellido, segundo_apellido, horario.lunes_entrada, horario.lunes_salida, horario.martes_entrada, horario.martes_salida, horario.miercoles_entrada, horario.miercoles_salida, horario.jueves_entrada, horario.jueves_salida, horario.viernes_entrada, horario.viernes_salida FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id WHERE sistema = 1 ''')
+        cur.execute(f''' SELECT nombre, primer_apellido, segundo_apellido, horario.lunes_entrada, horario.lunes_salida, horario.martes_entrada, horario.martes_salida, horario.miercoles_entrada, horario.miercoles_salida, horario.jueves_entrada, horario.jueves_salida, horario.viernes_entrada, horario.viernes_salida FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id WHERE sistema = 1 ''')
         r_professionals = cur.fetchall()
     except:
         return 'Hubo un problema al obtener la información de la base de datos'
@@ -512,7 +512,7 @@ def admin_students_modify():
     return render_template('admin/students_modify.html', active = 'admin_students', r_students = r_students)
 
 @app.route('/administrador/estudiantes/modificar/editardatos', methods = ['GET', 'POST'])
-@requires_access_level_and_session(roles['admin'] and roles['student'])
+@requires_access_level_and_session(roles['admin'])
 def admin_students_modify_commit():
     student_key =  request.args.get('student_key')
     if request.method == 'POST':
@@ -587,14 +587,13 @@ def admin_students_unsubscribe():
 @app.route('/administrador/estudiantes/datos', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
 def admin_students_data():
-
     if request.method == 'POST':
         student_key = request.form['to_select']
 
         return redirect(url_for('admin/student_data_tutor', student_key = student_key))
 
     try:
-        cur.execute('''
+        cur.execute(f'''
                     SELECT estudiante.id, nombre, primer_apellido, segundo_apellido, carrera.descripcion, semestre, correo, telefono, genero, faltas FROM estudiante INNER JOIN carrera on estudiante.carrera = carrera.id WHERE sistema = 1;
                     ''')
         r_students = cur.fetchall()
@@ -606,9 +605,8 @@ def admin_students_data():
 @app.route('/administrador/estudiantes/datos/tutor', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
 def admin_students_data_tutor():
-
     try:
-        cur.execute('''
+        cur.execute(f'''
                     SELECT estudiante.id, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, correo_tutor, telefono_tutor FROM estudiante INNER JOIN carrera on estudiante.carrera = carrera.id WHERE sistema = 1;
                     ''')
         r_students = cur.fetchall()
@@ -635,7 +633,9 @@ def admin_statistics_general():
         data['service'] = request.form['service']
 
         try:
-            cur.execute(f'''SELECT * FROM cita INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN profesionista ON cita.id_profesionista = profesionista.id WHERE estudiante.carrera = (SELECT carrera.id FROM carrera WHERE carrera.descripcion = '{data['career']}') AND profesionista.puesto = (SELECT puesto.id FROM puesto WHERE puesto.descripcion = '{data['service']}') AND cita.fecha BETWEEN '{data['start_date']}' AND '{data['finish_date']}' ''')
+            cur.execute(f'''
+                    SELECT * FROM cita INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN profesionista ON cita.id_profesionista = profesionista.id WHERE estudiante.carrera = (SELECT carrera.id FROM carrera WHERE carrera.descripcion = '{data['career']}') AND profesionista.puesto = (SELECT puesto.id FROM puesto WHERE puesto.descripcion = '{data['service']}') AND cita.fecha BETWEEN '{data['start_date']}' AND '{data['finish_date']}'
+                        ''')
             query_data = cur.fetchall()
         except:
             return 'Hubo un problema al obtener la información de la base de datos'
@@ -653,12 +653,10 @@ def admin_statistics_general():
 
     return render_template('admin/statistics_general.html', active = 'admin_statistics', r_service = r_service, r_career = r_career)
 
-
 @app.route('/administrador/estadisticas/profesionistas/vista', methods = ['GET','POST'])
 @requires_access_level_and_session(roles['admin'])
 def statics_general_view():
     pass
-
 
 @app.route('/administrador/estadisticas/profesionistas')
 @requires_access_level_and_session(roles['admin'])

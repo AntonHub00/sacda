@@ -90,11 +90,6 @@ Editar alumno
       <label for="career">Carreras</label>
       <select id="career" name="career" class="form-control">
         {% for career in r_career %}
-        	{% if career == student[0][4] %}
-            <option  selected="selected" value="{{ career[0] }}">{{ career[1] }}</option>
-         	{% endif %}
-            <option value="{{ career[0]}}">{{ career[1] }}</option>
-
           {% if career[1] == student[0][4]%}
             <option  selected="selected" value="{{ career[0] }}">{{ career[1] }}</option>
           {% else %}
@@ -119,13 +114,10 @@ Editar alumno
       <label for="semester">Semestre</label>
       <select class="form-control" id="semester" name="semester">
         {% for semester in range(14) %}
-          {% if semester ==  student[0][5] %}
-            <option selected="selected" value="{{ semester }}">{{ semester }}</option>
-          {% endif %}
-          {%if semester[1] == student[0][5] %}
-            <option selected="selected" value="{{ semester }}">{{ semester }}</option>
+          {%if semester == student[0][5] %}
+            <option selected="selected">{{ semester }}</option>
           {% else %}
-            <option value="{{ semester }}">{{ semester }}</option>
+            <option>{{ semester }}</option>
           {% endif%}
         {% endfor %}
       </select>
