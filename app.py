@@ -245,6 +245,7 @@ def admin_professionals_subscribe():
                 user = cur.fetchall()
             except:
                 return jsonify({'error':'Hubo un error al obtener información de la base de datos'})
+
             if user:
                 return jsonify({'error':'Ya existe un usuario con este RFC'})
 
@@ -287,7 +288,6 @@ def admin_professionals_subscribe():
         r_job = cur.fetchall()
     except:
         return jsonify({'error':'Hubo un error al obtener información de la base de datos'})
-
 
     return render_template('admin/professionals_subscribe.html', active = 'admin_professionals', r_place = r_place, r_job = r_job)
 
@@ -444,28 +444,26 @@ def subscribe():
 
         #Check whether the fields are filled
         if '' in data.values():
-            #return 'Los campos no pueden estar vacíos'
-            return render_template('main/subscribe.html', sent = 0)
+            return jsonify({'error':'Los campos no pueden estar vacíos'})
         elif not data['phone'].isdigit():
-            #return 'El campo teléfono solo debe contener dígitos'
-            return render_template('main/subscribe.html', sent = 1)
+            return jsonify({'error':'El campo teléfono debe contener únicamente números'})
+        elif not data['phone_tutor'].isdigit():
+            return jsonify({'error':'El campo teléfono de tutor debe contener únicamente números'})
         else:
             try:
                 cur.execute(f''' SELECT nombre FROM estudiante WHERE id = '{data['enrollment']}' ''')
                 user = cur.fetchall()
             except:
-                #return 'Hubo un problema al guadar la información en la base de datos'
-                return render_template('main/subscribe.html', sent = 3)
+                return jsonify({'error':'Hubo un error al obtener información de la base de datos'})
+
             if user:
-                #return 'Ya existe un usuario registrado con esa matrícula'
-                return render_template('main/subscribe.html', sent = 4)
+                return jsonify({'error':'Ya existe un usuario con esta matrícula'})
 
             try:
                 cur.execute(f''' SELECT id FROM carrera WHERE descripcion = '{data['career']}' ''')
                 data['career'] = cur.fetchall()[0][0]
             except:
-                #return 'Hubo un problema al obtener la información de la base de datos'
-                return render_template('main/subscribe.html', sent = 5)
+                return jsonify({'error':'Hubo un error al obtener información de la base de datos'})
 
             data['password'] = generate_password_hash(data['password'], method = 'sha256')
 
@@ -474,20 +472,18 @@ def subscribe():
                             INSERT INTO estudiante (id, nombre, primer_apellido, segundo_apellido, carrera, semestre, correo, telefono, genero, contraseña, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, telefono_tutor, correo_tutor) VALUES('{data['enrollment']}', '{data['name']}', '{data['first_last_name']}', '{data['second_last_name']}', {data['career']}, {data['semester']}, '{data['email']}', '{data['phone']}', '{data['gender']}', '{data['password']}', '{data['name_tutor']}', '{data['first_last_name_tutor']}', '{data['second_last_name_tutor']}', '{data['phone_tutor']}', '{data['email_tutor']}')
                             ''')
             except:
-                #return 'Hubo un problema al obtener la información de la base de datos'
-                return render_template('main/subscribe.html', sent = 5)
+                return jsonify({'error':'Hubo un error al insertar información en la base de datos'})
 
             mysql.connection.commit()
 
             #Implement message of success instead
-            return render_template('main/subscribe.html', sent = 6)
+            return jsonify({'new_url' : url_for('login'), 'success' : 'Alumno registrado correctamente' })
 
     try:
         cur.execute(''' SELECT * FROM carrera''')
         r_career = cur.fetchall()
     except:
-        #Error con la base
-        return render_template('main/subscribe.html', sent = 5)
+        return jsonify({'error':'Hubo un error al obtener información de la base de datos'})
 
     return render_template('main/subscribe.html', active = 'admin_students', r_career = r_career, sent = 'unknown')
 

@@ -7,71 +7,13 @@ Registrar alumnos
 
 
 {% block content %}
-{% if sent == 0 %}
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-  Los campos no pueden estar vacíos.
+<div id="my-s-s-error-message" class="alert alert-danger alert-dismissible fade show" role="alert" style="display:none">
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
-{% endif%}
 
-{% if sent == 1 %}
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-  El campo teléfono solo debe contener dígitos.
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-{% endif%}
-
-{% if sent == 2 %}
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-  El campo matrícula solo debe contener dígitos.
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-{% endif%}
-
-{% if sent == 3 %}
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-  Hubo un problema al guadar la información en la base de datos.
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-{% endif%}
-
-{% if sent == 4 %}
-<div class="alert alert-warning alert-dismissible fade show" role="alert">
-  Ya existe un usuario registrado con esa matrícula.
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-{% endif%}
-
-{% if sent == 5 %}
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
-  Hubo un problema al obtener la información de la base de datos.
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-{% endif%}
-
-{% if sent == 6 %}
-<div class="alert alert-success alert-dismissible fade show" role="alert">
-  El alumno se registró exitosamente.
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-{% endif%}
-
-
-<form method="POST" action="{{ url_for('subscribe') }}">
+<form id="my-s-s-form" method="POST" action="{{ url_for('subscribe') }}">
   <div class="form-row">
     <div class="form-group col-md-4">
       <label for="enrollment">Matrícula</label>
@@ -86,7 +28,6 @@ Registrar alumnos
       <input type="text" class="form-control" id="phone" name="phone" placeholder="Teléfono" maxlength="14">
     </div>
   </div>
-
   <div class="form-row">
     <div class="form-group col-md-4">
       <label for="name">Nombre</label>
