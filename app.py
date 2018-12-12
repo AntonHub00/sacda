@@ -408,7 +408,7 @@ def admin_professionals_modify_commit():
         cur.execute(f''' SELECT * FROM puesto''')
         r_job = cur.fetchall()
 
-        cur.execute(f''' SELECT id, lunes_entrada, lunes_salida FROM horario WHERE id = {professional_key} ''')
+        cur.execute(f''' SELECT id, lunes_entrada, lunes_salida FROM horario WHERE id = '{professional_key}' ''')
         r_schedule = cur.fetchall()
 
         cur.execute(f'''
