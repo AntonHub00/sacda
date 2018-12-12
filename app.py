@@ -449,9 +449,6 @@ def subscribe():
         elif not data['phone'].isdigit():
             #return 'El campo teléfono solo debe contener dígitos'
             return render_template('main/subscribe.html', sent = 1)
-        elif not data['enrollment'].isdigit():
-            #return 'El campo matrícula solo debe contener dígitos'
-            return render_template('main/subscribe.html', sent = 2)
         else:
             try:
                 cur.execute(f''' SELECT nombre FROM estudiante WHERE id = '{data['enrollment']}' ''')
@@ -539,7 +536,7 @@ def admin_students_modify_commit():
             return 'El campo teléfono debe contener unicamente números'
         else:
             try:
-                cur.execute(f''' UPDATE estudiante SET nombre = '{data['name']}', primer_apellido = '{data['first_last_name']}', segundo_apellido = '{data['second_last_name']}', correo = '{data['email']}', telefono = '{data['phone']}', carrera = {data['career']}, semestre = {data['semester']}, nombre_tutor = '{data['name_tutor']}', primer_apellido_tutor = '{data['first_last_name_tutor']}', segundo_apellido_tutor = '{data['second_last_name_tutor']}', telefono_tutor = '{data['phone_tutor']}', correo_tutor = '{data['email_tutor']}', genero = '{data['gender']}' WHERE id = {data['enrollment']} ''')
+                cur.execute(f''' UPDATE estudiante SET nombre = '{data['name']}', primer_apellido = '{data['first_last_name']}', segundo_apellido = '{data['second_last_name']}', correo = '{data['email']}', telefono = '{data['phone']}', carrera = {data['career']}, semestre = {data['semester']}, nombre_tutor = '{data['name_tutor']}', primer_apellido_tutor = '{data['first_last_name_tutor']}', segundo_apellido_tutor = '{data['second_last_name_tutor']}', telefono_tutor = '{data['phone_tutor']}', correo_tutor = '{data['email_tutor']}', genero = '{data['gender']}' WHERE id = '{data['enrollment']}' ''')
             except:
                 return 'Hubo un problema al actualizar la información de la base de datos'
 
@@ -606,7 +603,7 @@ def admin_students_data_tutor():
     student_key =  request.args.get('student_key')
     try:
         cur.execute(f'''
-                    SELECT estudiante.id, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, correo_tutor, telefono_tutor FROM estudiante INNER JOIN carrera on estudiante.carrera = carrera.id WHERE sistema = 1 AND estudiante.id = {student_key};
+                    SELECT estudiante.id, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, correo_tutor, telefono_tutor FROM estudiante INNER JOIN carrera on estudiante.carrera = carrera.id WHERE sistema = 1 AND estudiante.id = '{student_key}';
                     ''')
         r_students = cur.fetchall()
     except:
