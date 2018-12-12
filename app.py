@@ -325,45 +325,12 @@ def admin_professionals_modify():
         return redirect(url_for('admin_professionals_modify_commit', professional_key = professional_key))
 
     try:
-        cur.execute(f''' SELECT profesionista.id, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion, horario.lunes_entrada,horario.lunes_salida, correo, telefono FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id  WHERE sistema = 1''')
+        cur.execute(f''' SELECT profesionista.id, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion, TIME_FORMAT(horario.lunes_entrada,'%H:%i'),TIME_FORMAT(horario.lunes_salida,'%H:%i'), correo, telefono FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id  WHERE sistema = 1''')
         r_professionals = cur.fetchall()
     except:
         return 'Hubo un problema al obtener la información de la base de datos'
 
     return render_template('admin/professionals_modify.html', active = 'admin_professionals', r_professionals = r_professionals)
-
-@app.route('/administrador/profesionales/ver', methods = ['GET', 'POST'])
-@requires_access_level_and_session(roles['admin'])
-def admin_professionals_data():
-    if request.method == 'POST':
-        professional_key = request.form['to_select']
-
-        return redirect(url_for('admin_professionals_horario', professional_key = professional_key))
-
-    try:
-        cur.execute(f''' SELECT profesionista.id, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion, horario.lunes_entrada,horario.lunes_salida, correo, telefono FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id  WHERE sistema = 1''')
-        r_professionals = cur.fetchall()
-    except:
-        return 'Hubo un problema al obtener la información de la base de datos'
-
-    return render_template('admin/professionals_data.html', active = 'admin_professionals', r_professionals = r_professionals)
-
-@app.route('/administrador/profesionales/ver/horario', methods = ['GET', 'POST'])
-@requires_access_level_and_session(roles['admin'])
-def admin_professionals_horario():
-    professional_key = request.args.get('professional_key')
-    if request.method == 'POST':
-        professional_key = request.form['to_select']
-
-        return redirect(url_for('admin_professionals_horario', professional_key = professional_key))
-
-    try:
-        cur.execute(f''' SELECT nombre, primer_apellido, segundo_apellido, horario.lunes_entrada, horario.lunes_salida, horario.martes_entrada, horario.martes_salida, horario.miercoles_entrada, horario.miercoles_salida, horario.jueves_entrada, horario.jueves_salida, horario.viernes_entrada, horario.viernes_salida FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id WHERE profesionista.id = '{professional_key}' AND sistema = 1 ''')
-        r_professionals = cur.fetchall()
-    except:
-        return 'Hubo un problema al obtener la información de la base de datos'
-
-    return render_template('admin/professionals_horarios.html', active = 'admin_professionals', r_professionals = r_professionals)
 
 @app.route('/administrador/profesionales/modificar/editar', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
@@ -408,7 +375,7 @@ def admin_professionals_modify_commit():
         cur.execute(f''' SELECT * FROM puesto''')
         r_job = cur.fetchall()
 
-        cur.execute(f''' SELECT id, lunes_entrada, lunes_salida FROM horario WHERE id = '{professional_key}' ''')
+        cur.execute(f''' SELECT id, TIME_FORMAT(lunes_entrada, '%H:%i'), TIME_FORMAT(lunes_salida, '%H:%i') FROM horario WHERE id = '{professional_key}' ''')
         r_schedule = cur.fetchall()
 
         cur.execute(f'''
@@ -419,6 +386,50 @@ def admin_professionals_modify_commit():
         return 'Hubo un problema al obtener la información de la base de datos'
 
     return render_template('admin/professionals_modify_commit.html', active = 'admin_professionals', r_place = r_place, r_job = r_job, r_schedule = r_schedule,  professional = professional)
+
+@app.route('/administrador/profesionales/ver', methods = ['GET', 'POST'])
+@requires_access_level_and_session(roles['admin'])
+def admin_professionals_data():
+    if request.method == 'POST':
+        professional_key = request.form['to_select']
+
+        return redirect(url_for('admin_professionals_horario', professional_key = professional_key))
+
+    try:
+        cur.execute(f''' SELECT profesionista.id, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion, horario.lunes_entrada,horario.lunes_salida, correo, telefono FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id  WHERE sistema = 1''')
+        r_professionals = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('admin/professionals_data.html', active = 'admin_professionals', r_professionals = r_professionals)
+
+@app.route('/administrador/profesionales/ver/horario', methods = ['GET', 'POST'])
+@requires_access_level_and_session(roles['admin'])
+def admin_professionals_horario():
+    professional_key = request.args.get('professional_key')
+    if request.method == 'POST':
+        professional_key = request.form['to_select']
+
+        return redirect(url_for('admin_professionals_horario', professional_key = professional_key))
+
+    try:
+        cur.execute(f''' SELECT nombre, primer_apellido, segundo_apellido, 
+                TIME_FORMAT(horario.lunes_entrada, '%H:%i'),
+                TIME_FORMAT(horario.lunes_salida, '%H:%i'),
+                TIME_FORMAT(horario.martes_entrada, '%H:%i'),
+                TIME_FORMAT(horario.martes_salida, '%H:%i'),
+                TIME_FORMAT(horario.miercoles_entrada, '%H:%i'),
+                TIME_FORMAT(horario.miercoles_salida, '%H:%i'),
+                TIME_FORMAT(horario.jueves_entrada, '%H:%i'),
+                TIME_FORMAT(horario.jueves_salida, '%H:%i'),
+                TIME_FORMAT(horario.viernes_entrada, '%H:%i'),
+                TIME_FORMAT(horario.viernes_salida, '%H:%i')
+               FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id WHERE profesionista.id = '{professional_key}' AND sistema = 1 ''')
+        r_professionals = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('admin/professionals_horarios.html', active = 'admin_professionals', r_professionals = r_professionals)
 
 @app.route('/registrarme', methods = ['GET', 'POST'])
 def subscribe():
@@ -607,10 +618,10 @@ def admin_students_data_tutor():
 
     return render_template('admin/students_data_tutor.html', active = 'admin_students', r_students = r_students)
 
-@app.route('/administrador/agendas')
-@requires_access_level_and_session(roles['admin'])
-def admin_schedule():
-    return render_template('admin/schedule.html', active = 'admin_schedule')
+#@app.route('/administrador/agendas')
+#@requires_access_level_and_session(roles['admin'])
+#def admin_schedule():
+#    return render_template('admin/schedule.html', active = 'admin_schedule')
 
 @app.route('/administrador/estadisticas/generales', methods = ['GET', 'POST'])
 @requires_access_level_and_session(roles['admin'])
@@ -664,7 +675,7 @@ def admin_appointment():
         return redirect(url_for('admin_appointment'))
 
     try:
-        cur.execute(f''' SELECT cita.id, profesionista.nombre, profesionista.primer_apellido, profesionista.segundo_apellido, puesto.descripcion, estudiante.nombre, estudiante.primer_apellido, estudiante.segundo_apellido,  carrera.descripcion, cita.fecha, cita.hora_inicio, cita.hora_fin, lugar.descripcion FROM cita INNER JOIN profesionista ON cita.id_profesionista = profesionista.id INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN lugar ON profesionista.lugar=lugar.id INNER JOIN carrera ON estudiante.carrera = carrera.id WHERE cita.sistema = 1 ''')
+        cur.execute(f''' SELECT cita.id, profesionista.nombre, profesionista.primer_apellido, profesionista.segundo_apellido, puesto.descripcion, estudiante.nombre, estudiante.primer_apellido, estudiante.segundo_apellido,  carrera.descripcion, DATE_FORMAT(cita.fecha,'%d/%m/%Y'), TIME_FORMAT(cita.hora_inicio, '%H:%i'), TIME_FORMAT(cita.hora_fin, '%H:%i'), lugar.descripcion FROM cita INNER JOIN profesionista ON cita.id_profesionista = profesionista.id INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN estudiante ON cita.id_estudiante = estudiante.id INNER JOIN lugar ON profesionista.lugar=lugar.id INNER JOIN carrera ON estudiante.carrera = carrera.id WHERE cita.sistema = 1 ''')
         r_appointments = cur.fetchall()
     except:
         return 'Hubo un problema al obtener la información de la base de datos citas'
@@ -704,7 +715,7 @@ def professional_schedule():
 def professional_data():
     try:
         cur.execute(f'''
-                    SELECT nombre, primer_apellido, segundo_apellido, correo, telefono, puesto.descripcion, horario.lunes_entrada, horario.lunes_salida, lugar.descripcion FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN horario ON profesionista.id = horario.id INNER JOIN lugar ON profesionista.lugar = lugar.id WHERE profesionista.id = '{session['user']}'
+                    SELECT nombre, primer_apellido, segundo_apellido, correo, telefono, puesto.descripcion,TIME_FORMAT(horario.lunes_entrada,'%H:%i'), TIME_FORMAT(horario.lunes_salida, '%H:%i'), lugar.descripcion FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN horario ON profesionista.id = horario.id INNER JOIN lugar ON profesionista.lugar = lugar.id WHERE profesionista.id = '{session['user']}'
                     ''')
         professional_data = cur.fetchall()
     except:
@@ -760,7 +771,7 @@ def student_modify():
             return 'El campo teléfono debe contener unicamente números'
         else:
             try:
-                cur.execute(f''' UPDATE estudiante SET nombre = '{data['name']}', primer_apellido = '{data['first_last_name']}', segundo_apellido = '{data['second_last_name']}', correo = '{data['email']}', telefono = '{data['phone']}', carrera = {data['career']}, semestre = {data['semester']}, nombre_tutor = '{data['name_tutor']}', primer_apellido_tutor = '{data['first_last_name_tutor']}', segundo_apellido_tutor = '{data['second_last_name_tutor']}', telefono_tutor = '{data['phone_tutor']}', correo_tutor = '{data['email_tutor']}', genero = '{data['gender']}' WHERE id = {data['enrollment']} ''')
+                cur.execute(f''' UPDATE estudiante SET nombre = '{data['name']}', primer_apellido = '{data['first_last_name']}', segundo_apellido = '{data['second_last_name']}', correo = '{data['email']}', telefono = '{data['phone']}', carrera = {data['career']}, semestre = {data['semester']}, nombre_tutor = '{data['name_tutor']}', primer_apellido_tutor = '{data['first_last_name_tutor']}', segundo_apellido_tutor = '{data['second_last_name_tutor']}', telefono_tutor = '{data['phone_tutor']}', correo_tutor = '{data['email_tutor']}', genero = '{data['gender']}' WHERE id = '{data['enrollment']}' ''')
             except:
                 return 'Hubo un problema al actualizar la información de la base de datos'
 
@@ -771,7 +782,7 @@ def student_modify():
         cur.execute(f''' SELECT * FROM carrera''')
         r_career = cur.fetchall()
 
-        cur.execute(f'''SELECT estudiante.id, nombre, primer_apellido, segundo_apellido, carrera.descripcion, semestre, correo, telefono, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, telefono_tutor, correo_tutor, genero FROM estudiante INNER JOIN carrera ON carrera.id = estudiante.carrera WHERE estudiante.id = {student_key} AND sistema = 1''')
+        cur.execute(f'''SELECT estudiante.id, nombre, primer_apellido, segundo_apellido, carrera.descripcion, semestre, correo, telefono, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, telefono_tutor, correo_tutor, genero FROM estudiante INNER JOIN carrera ON carrera.id = estudiante.carrera WHERE estudiante.id = '{student_key}' AND sistema = 1''')
         student = cur.fetchall()
     except:
         return 'Hubo un problema al obtener la información de la base de datos modificar commit'
@@ -808,7 +819,7 @@ def student_appointment():
         return redirect(url_for('student_appointment'))
 
     try:
-        cur.execute(f''' SELECT cita.id, profesionista.nombre, profesionista.primer_apellido,fecha, hora_inicio, hora_fin, puesto.descripcion, lugar.descripcion FROM cita INNER JOIN profesionista ON cita.id_profesionista = profesionista.id INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id WHERE cita.id_estudiante = '{session['user']}' AND cita.sistema = 1 ''')
+        cur.execute(f''' SELECT cita.id, profesionista.nombre, profesionista.primer_apellido,DATE_FORMAT(fecha,'%d/%m/%Y'), TIME_FORMAT(hora_inicio, '%H:%i'), TIME_FORMAT(hora_fin, '%H:%i'), puesto.descripcion, lugar.descripcion FROM cita INNER JOIN profesionista ON cita.id_profesionista = profesionista.id INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id WHERE cita.id_estudiante = '{session['user']}' AND cita.sistema = 1 ''')
         r_appointments = cur.fetchall()
     except:
         return 'Hubo un problema al obtener la información de la base de datos citas'
