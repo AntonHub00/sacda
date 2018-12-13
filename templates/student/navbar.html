@@ -15,9 +15,9 @@
     {% endif %}
 
     {% if active == 'student_schedule_professionals' %}
-    <a class="nav-item nav-link active text-center" href="{{ url_for('student_schedule') }}">Agendar</a>
+    <a class="nav-item nav-link active text-center" href="{{ url_for('student_choose_to_appointment') }}">Agendar</a>
     {% else %}
-    <a class="nav-item nav-link text-center" href="{{ url_for('student_schedule') }}">Agendar</a>
+    <a class="nav-item nav-link text-center" href="{{ url_for('student_choose_to_appointment') }}">Agendar</a>
     {% endif %}
 
     {% if active == 'student_appointment' %}

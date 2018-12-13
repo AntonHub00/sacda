@@ -413,7 +413,7 @@ def admin_professionals_horario():
         return redirect(url_for('admin_professionals_horario', professional_key = professional_key))
 
     try:
-        cur.execute(f''' SELECT nombre, primer_apellido, segundo_apellido, 
+        cur.execute(f''' SELECT nombre, primer_apellido, segundo_apellido,
                 TIME_FORMAT(horario.lunes_entrada, '%H:%i'),
                 TIME_FORMAT(horario.lunes_salida, '%H:%i'),
                 TIME_FORMAT(horario.martes_entrada, '%H:%i'),
@@ -736,10 +736,84 @@ def student_home():
 
     return render_template('student/home.html', active = 'student_home', student_name = student_name)
 
-@app.route('/alumno/agendar')
+@app.route('/alumno/agendar', methods = ['GET','POST'])
 @requires_access_level_and_session(roles['student'])
-def student_schedule():
-    return render_template('student/schedule.html', active = 'student_schedule')
+def student_choose_to_appointment():
+    if request.method == 'POST':
+        professional_key = request.form['to_select']
+
+        return redirect(url_for('student_choose_to_appointment_date', professional_key = professional_key))
+
+    try:
+        cur.execute(f''' SELECT profesionista.id, nombre, primer_apellido, segundo_apellido, puesto.descripcion, lugar.descripcion, TIME_FORMAT(horario.lunes_entrada,'%H:%i'),TIME_FORMAT(horario.lunes_salida,'%H:%i'), correo, telefono FROM profesionista INNER JOIN puesto ON profesionista.puesto = puesto.id INNER JOIN lugar ON profesionista.lugar = lugar.id INNER JOIN horario ON profesionista.id = horario.id  WHERE sistema = 1''')
+        r_professionals = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener la información de la base de datos'
+
+    return render_template('student/choose_to_appointment.html', active = 'admin_professionals', r_professionals = r_professionals)
+
+@app.route('/alumno/agendar/fecha', methods = ['GET','POST'])
+@requires_access_level_and_session(roles['student'])
+def student_choose_to_appointment_date():
+    professional_key =  request.args.get('professional_key')
+    if request.method == 'POST':
+        data = {}
+        not_available = {}
+
+        data['date'] = request.form['date']
+        data['key'] = request.form['key']
+
+        #Check whether the fields are filled
+        if '' in data.values():
+            ##return 'El campo fecha no puede estar vacío'
+            return render_template('student/make_appointment.html', active = 'admin_professionals', professional_key = data['key'])
+        else:
+            return redirect(url_for('student_choose_to_appointment_time', professional_key = data['key'], date = data['date']))
+
+    return render_template('student/make_appointment.html', active = 'admin_professionals', professional_key = professional_key)
+
+@app.route('/alumno/agendar/hora', methods = ['GET','POST'])
+@requires_access_level_and_session(roles['student'])
+def student_choose_to_appointment_time():
+    professional_key =  request.args.get('professional_key')
+    date =  request.args.get('date')
+
+    if request.method == 'POST':
+        data = {}
+
+        data['date'] = request.form['date']
+        data['key'] = request.form['key']
+        data['hour'] = request.form['hour']
+
+        #Check whether the fields are filled
+        if '' in data.values():
+            ##return 'El campo fecha no puede estar vacío'
+            return render_template('student/make_appointment.html', active = 'admin_professionals', professional_key = data['key'])
+        else:
+            try:
+                cur.execute(f'''
+                INSERT INTO cita (id_profesionista, id_estudiante, fecha, hora_inicio, hora_fin) VALUES('{data['key']}', '{session['user']}', STR_TO_DATE('{data['date']}', '%d/%m/%Y'), '{data['hour']}', ADDTIME('{data['hour']}', '01:00'))
+                            ''')
+                not_available = cur.fetchall()
+            except:
+                return 'Hubo un problema al insertar información de la base de datos'
+
+            mysql.connection.commit()
+            return redirect(url_for('student_appointment'))
+
+    try:
+        cur.execute(f'''
+        SELECT DATE_FORMAT(hora_inicio,'%H:%i') FROM cita WHERE fecha = STR_TO_DATE('{date}', '%d/%m/%Y') AND id_profesionista = '{professional_key}' AND sistema = 1;
+                    ''')
+        not_available = cur.fetchall()
+    except:
+        return 'Hubo un problema al obtener información de la base de datos'
+
+    my_not = []
+    for item in not_available:
+        my_not.append(item[0])
+
+    return render_template('student/make_appointment_commit.html', active = 'admin_professionals', professional_key = professional_key, my_not = my_not, date = date)
 
 @app.route('/alumno/datos/modificar', methods = ['GET','POST'])
 @requires_access_level_and_session(roles['student'])
@@ -795,7 +869,7 @@ def student_data():
     if request.method == 'POST':
         student_key = request.form['to_select']
         return redirect(url_for('student_modify', student_key = student_key ))
-   
+
     try:
         cur.execute(f''' SELECT nombre, primer_apellido, segundo_apellido, carrera.descripcion, semestre, correo, telefono, genero, nombre_tutor, primer_apellido_tutor, segundo_apellido_tutor, telefono_tutor, correo_tutor, estudiante.id FROM estudiante INNER JOIN carrera on estudiante.carrera = carrera.id WHERE estudiante.id = '{session['user']}' ''')
         student_data = cur.fetchall()
@@ -828,4 +902,3 @@ def student_appointment():
 
 if __name__ == '__main__':
     app.run(debug = True)
-

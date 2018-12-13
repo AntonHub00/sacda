@@ -1,0 +1,39 @@
+{% extends 'student/navbar.html' %}
+
+{% macro render_hours() %}
+{% for hour in range(7, 21) %}
+{% set hour = '{:02d}:00'.format(hour) %}
+  {% if not my_not %}
+    <option selected>{{ hour }}</option>
+  {%else%}
+    {% if hour not in my_not %}
+      <option selected>{{ hour }}</option>
+    {% endif %}
+  {% endif %}
+{% endfor %}
+{% endmacro %}
+
+{% block title %}
+Agendar
+{% endblock title %}
+
+{% block content %}
+<form method="POST" action="{{ url_for('student_choose_to_appointment_time') }}">
+  <div class="form-row">
+    <input type="text" value="{{ professional_key }}" style="display:none" name="key">
+    <input type="text" value="{{ date }}" style="display:none" name="date">
+    <div class="form-group col-4">
+    </div>
+      <div class="form-group col-md-4">
+        <label for="hour">Hora de cita</label>
+        <select id="hour" name="hour" class="form-control">
+          {{ render_hours() }}
+        </select>
+        <button type="submit" class="btn btn-primary btn-block">Confirmar</button>
+      </div>
+    <div class="form-group col-4">
+    </div>
+  </div>
+</form>
+{% endblock content %}
+
